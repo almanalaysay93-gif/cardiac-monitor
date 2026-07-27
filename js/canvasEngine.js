@@ -173,32 +173,32 @@ class MonitorCanvasEngine {
 
         this.drawGrid();
 
-        // 5 Channel Layout Heights (Aligned 1:1 with 6-row Vitals Grid)
+        // 5 Channel Layout Heights (Shifted downward for top headroom & scaled larger)
         const rowH = h / 6.0;
 
-        const ecgCenterY = rowH * 0.5;   // Slot 1 (HR / PR)
-        const ecgScale = (rowH * 0.40) * this.gain;
+        const ecgCenterY = rowH * 0.58;   // Shifted downward to give top R-peak breathing room
+        const ecgScale = (rowH * 0.52) * this.gain; // Prominent, larger ECG waves
 
-        const alineCenterY = rowH * 1.5; // Slot 2 (ART IBP)
-        const alineScale = rowH * 0.35;
+        const alineCenterY = rowH * 1.58; // Slot 2 (ART IBP)
+        const alineScale = rowH * 0.45;
 
-        const plethCenterY = rowH * 2.5; // Slot 3 (SpO2 PLETH)
-        const plethScale = rowH * 0.32;
+        const plethCenterY = rowH * 2.58; // Slot 3 (SpO2 PLETH)
+        const plethScale = rowH * 0.42;
 
         // Slot 4 (NIBP) has no waveform trace
 
-        const etco2CenterY = rowH * 4.5; // Slot 5 (EtCO2 CAPNOGRAM)
-        const etco2Scale = rowH * 0.32;
+        const etco2CenterY = rowH * 4.58; // Slot 5 (EtCO2 CAPNOGRAM)
+        const etco2Scale = rowH * 0.42;
 
-        const respCenterY = rowH * 5.5;  // Slot 6 (RESP WAVE)
-        const respScale = rowH * 0.28;
+        const respCenterY = rowH * 5.58;  // Slot 6 (RESP WAVE)
+        const respScale = rowH * 0.38;
 
-        // Render 5 Traces
-        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.0);
-        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 1.8);
-        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 1.8);
-        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 1.8);
-        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 1.8);
+        // Render 5 Traces with Thicker, Vibrant Lines
+        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.4);
+        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 2.2);
+        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 2.2);
+        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 2.2);
+        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 2.2);
 
         // Sweep Bar
         if (!this.isFrozen) {
@@ -236,22 +236,22 @@ class MonitorCanvasEngine {
             this.drawCalipers();
         }
 
-        // Trace Labels (Positioned Flush with Each Row Baseline)
+        // Trace Labels (Clean Top Padding)
         this.ctx.font = '11px "Roboto Mono", monospace';
         this.ctx.fillStyle = 'rgba(0, 255, 102, 0.85)';
-        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, 16);
+        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, 15);
 
         this.ctx.fillStyle = 'rgba(255, 77, 77, 0.85)';
-        this.ctx.fillText('ART (A-LINE IBP)', 15, rowH * 1.0 + 16);
+        this.ctx.fillText('ART (A-LINE IBP)', 15, rowH * 1.0 + 15);
 
         this.ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
-        this.ctx.fillText('SpO2 PLETH', 15, rowH * 2.0 + 16);
+        this.ctx.fillText('SpO2 PLETH', 15, rowH * 2.0 + 15);
 
         this.ctx.fillStyle = 'rgba(216, 180, 254, 0.85)';
-        this.ctx.fillText('EtCO2 CAPNOGRAM', 15, rowH * 4.0 + 16);
+        this.ctx.fillText('EtCO2 CAPNOGRAM', 15, rowH * 4.0 + 15);
 
         this.ctx.fillStyle = 'rgba(255, 235, 59, 0.85)';
-        this.ctx.fillText('RESP WAVE', 15, rowH * 5.0 + 16);
+        this.ctx.fillText('RESP WAVE', 15, rowH * 5.0 + 15);
 
         if (this.isFrozen) {
             this.ctx.font = 'bold 16px "Roboto Mono", monospace';
