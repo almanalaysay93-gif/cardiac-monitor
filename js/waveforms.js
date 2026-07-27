@@ -126,16 +126,58 @@ class WaveformGenerator {
     }
 
     /**
-     * 12-Lead ECG Projection Generator
+     * 12-Lead ECG Projection Generator (Synchronized with active monitor rhythm)
      */
     generate12LeadSample(lead, p) {
-        const base = this.generatePQRST(p);
+        const rhythm = this.currentRhythm;
+        let base = 0;
 
-        // Lead-specific vector transformations
+        switch (rhythm) {
+            case 'stemi':
+                // ST elevation in Inferior Leads (II, III, aVF) & reciprocal ST depression in I, aVL
+                if (lead === 'II' || lead === 'III' || lead === 'aVF') {
+                    return this.generatePQRST(p, { stElev: 0.55, tAmp: 0.4, rAmp: 1.1 });
+                } else if (lead === 'I' || lead === 'aVL') {
+                    return this.generatePQRST(p, { stElev: -0.3, tAmp: -0.2, rAmp: 0.6 });
+                }
+                base = this.generatePQRST(p, { stElev: 0.45, tAmp: 0.4, rAmp: 1.1 });
+                break;
+            case 'ischemia':
+                // ST depression in precordial leads
+                if (lead.startsWith('V')) {
+                    return this.generatePQRST(p, { stElev: -0.35, tAmp: -0.2 });
+                }
+                base = this.generatePQRST(p, { stElev: -0.25, tAmp: -0.15 });
+                break;
+            case 'vtach':
+                base = Math.sin(p * Math.PI * 2) * 0.9 + this.gaussian(p, 1.2, 0.3, 0.05) - 0.2;
+                if (lead === 'aVR') return -base * 0.9;
+                if (lead === 'V1' || lead === 'V2') return -base * 1.1;
+                return base;
+            case 'vfib':
+                const c1 = Math.sin(this.time * 7.3 + (lead.charCodeAt(0) * 0.5));
+                const c2 = Math.cos(this.time * 11.7 + (lead.charCodeAt(1) * 0.3 || 0));
+                return (c1 * 0.4 + c2 * 0.3 + (Math.random() - 0.5) * 0.2);
+            case 'asystole':
+                return (Math.random() - 0.5) * 0.03 + Math.sin(this.time * 0.5) * 0.04;
+            case 'torsades':
+                const ampMod = 0.3 + 0.9 * Math.abs(Math.sin(this.torsadesPhase));
+                base = (Math.sin(p * Math.PI * 2) * 0.8 + this.gaussian(p, 1.1, 0.3, 0.06)) * ampMod;
+                if (lead === 'aVR') return -base;
+                return base;
+            case 'pacemaker':
+                base = this.generatePQRST(p, { pacerSpike: true });
+                break;
+            default:
+                base = this.generatePQRST(p);
+                break;
+        }
+
+        // Standard 12-lead anatomical limb & precordial vector transformations
         switch (lead) {
             case 'I':   return base * 0.7 + this.gaussian(p, 0.1, 0.12, 0.04);
-            case 'II':  return base; // Standard reference
-            case 'III': return base * 0.5 - this.gaussian(p, 0.15, 0.3, 0.012);
+            case 'II':  return base; // Reference lead II
+            case 'III': return base * 0.6 - this.gaussian(p, 0.15, 0.3, 0.012);
             case 'aVR': return -base * 0.8; // Inverted in aVR
             case 'aVL': return base * 0.4 + this.gaussian(p, -0.1, 0.55, 0.06);
             case 'aVF': return base * 0.85;
