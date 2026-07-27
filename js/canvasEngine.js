@@ -173,24 +173,24 @@ class MonitorCanvasEngine {
 
         this.drawGrid();
 
-        // 5 Channel Layout Heights (ART Blood Pressure in Row 1 Top, ECG in Row 2)
+        // 5 Channel Layout Heights (ART in Row 1, NIBP in Row 2, ECG HR in Row 3)
         const rowH = h / 6.0;
 
         const alineCenterY = rowH * 0.58; // Slot 1 (Top: ART Blood Pressure)
         const alineScale = rowH * 0.38;
 
-        const ecgCenterY = rowH * 1.62;   // Slot 2 (HR / ECG Lead II)
+        // Slot 2 (Row 2 - NIBP) has no continuous waveform trace
+
+        const ecgCenterY = rowH * 2.68;   // Slot 3 (Row 3 - HR / ECG Lead II)
         const ecgScale = (rowH * 0.44) * this.gain;
 
-        const plethCenterY = rowH * 2.62; // Slot 3 (SpO2 PLETH)
+        const plethCenterY = rowH * 3.62; // Slot 4 (Row 4 - SpO2 PLETH)
         const plethScale = rowH * 0.35;
 
-        // Slot 4 (NIBP) has no continuous waveform trace
-
-        const etco2CenterY = rowH * 4.62; // Slot 5 (EtCO2 CAPNOGRAM)
+        const etco2CenterY = rowH * 4.62; // Slot 5 (Row 5 - EtCO2 CAPNOGRAM)
         const etco2Scale = rowH * 0.35;
 
-        const respCenterY = rowH * 5.62;  // Slot 6 (RESP WAVE)
+        const respCenterY = rowH * 5.62;  // Slot 6 (Row 6 - RESP WAVE)
         const respScale = rowH * 0.32;
 
         // Render 5 Traces with 100% UNIFORM line thickness (2.0px) across all channels
@@ -243,10 +243,10 @@ class MonitorCanvasEngine {
         this.ctx.fillText('ART (A-LINE IBP)', 15, 15);
 
         this.ctx.fillStyle = 'rgba(0, 255, 102, 0.85)';
-        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, rowH * 1.0 + 15);
+        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, rowH * 2.0 + 15);
 
         this.ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
-        this.ctx.fillText('SpO2 PLETH', 15, rowH * 2.0 + 15);
+        this.ctx.fillText('SpO2 PLETH', 15, rowH * 3.0 + 15);
 
         this.ctx.fillStyle = 'rgba(216, 180, 254, 0.85)';
         this.ctx.fillText('EtCO2 CAPNOGRAM', 15, rowH * 4.0 + 15);

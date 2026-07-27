@@ -97,7 +97,7 @@
                 <!-- Vitals Column -->
                 <div class="vitals-column">
                     
-                    <!-- Arterial Line Blood Pressure (ART IBP) -->
+                    <!-- Arterial Line Blood Pressure (ART IBP) - Row 1 (Top) -->
                     <div class="vital-box vital-aline">
                         <div class="vital-header">
                             <span>ART (IBP)</span>
@@ -107,7 +107,17 @@
                         <div class="vital-unit">A-LINE</div>
                     </div>
 
-                    <!-- Heart Rate (HR) -->
+                    <!-- NIBP (Non-Invasive Blood Pressure) - Row 2 (Above HR/PR) -->
+                    <div class="vital-box vital-nibp">
+                        <div class="vital-header">
+                            <span>NIBP</span>
+                            <button id="nibpCycleBtn" style="background:none; border:none; color:#38bdf8; cursor:pointer; font-weight:700; font-size:0.7rem;">[START]</button>
+                        </div>
+                        <div id="nibpValue" class="vital-value" style="font-size: 1.4rem; margin-top: 4px;">120/80 (93)</div>
+                        <div class="vital-unit">mmHg</div>
+                    </div>
+
+                    <!-- Heart Rate (HR) - Row 3 -->
                     <div class="vital-box vital-hr">
                         <div class="vital-header">
                             <span>HR / PR</span>
@@ -117,7 +127,7 @@
                         <div class="vital-unit">BPM</div>
                     </div>
 
-                    <!-- SpO2 -->
+                    <!-- SpO2 - Row 4 -->
                     <div class="vital-box vital-spo2">
                         <div class="vital-header">
                             <span>SpO2</span>
@@ -125,16 +135,6 @@
                         </div>
                         <div id="spo2Value" class="vital-value">98%</div>
                         <div class="vital-unit">PULSE</div>
-                    </div>
-
-                    <!-- NIBP (Blood Pressure) -->
-                    <div class="vital-box vital-nibp">
-                        <div class="vital-header">
-                            <span>NIBP (mmHg)</span>
-                            <button id="nibpCycleBtn" style="background:none; border:none; color:#38bdf8; cursor:pointer; font-weight:700; font-size:0.7rem;">[START]</button>
-                        </div>
-                        <div id="nibpValue" class="vital-value" style="font-size: 1.4rem; margin-top: 4px;">120/80 (93)</div>
-                        <div class="vital-unit">CUFF</div>
                     </div>
 
                     <!-- EtCO2 Capnography -->
