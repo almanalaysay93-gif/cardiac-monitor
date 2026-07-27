@@ -156,14 +156,23 @@ body {
     border: 2px solid #1e293b;
     border-radius: 12px;
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.5);
-    display: grid;
-    grid-template-columns: 1fr 220px;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     position: relative;
 }
 
+.monitor-body-wrap {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
 @media (max-width: 768px) {
-    .monitor-bezel {
+    .monitor-body-wrap {
         grid-template-columns: 1fr;
     }
 }
@@ -699,20 +708,20 @@ body.fullscreen-active .exit-fullscreen-btn {
 
 /* Fullscreen Emergency Resuscitation Quick-Bar */
 .fullscreen-quickbar {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    right: 14px;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 30px;
-    padding: 8px 18px;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: #090e15;
+    border-bottom: 1px solid #1e293b;
+    border-radius: 0;
+    padding: 8px 16px;
     display: none;
     align-items: center;
     justify-content: space-between;
     z-index: 99;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
 }
 
 body.fullscreen-active .fullscreen-quickbar {
