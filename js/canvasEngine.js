@@ -173,32 +173,32 @@ class MonitorCanvasEngine {
 
         this.drawGrid();
 
-        // 5 Channel Layout Heights (Guaranteed top headroom & clear margins)
+        // 5 Channel Layout Heights (ECG HR trace rendered BIGGER & more prominent than all others)
         const rowH = h / 6.0;
 
-        const ecgCenterY = rowH * 0.65;   // Lowered baseline to ensure R-peaks NEVER touch the top edge
-        const ecgScale = (rowH * 0.38) * this.gain; // Prominent, clear ECG waves with 25px top clearance
+        const ecgCenterY = rowH * 0.68;   // Baseline lowered for top clearance
+        const ecgScale = (rowH * 0.44) * this.gain; // Primary ECG HR waveform: BIGGER & taller amplitude!
 
         const alineCenterY = rowH * 1.62; // Slot 2 (ART IBP)
-        const alineScale = rowH * 0.36;
+        const alineScale = rowH * 0.30;
 
         const plethCenterY = rowH * 2.62; // Slot 3 (SpO2 PLETH)
-        const plethScale = rowH * 0.35;
+        const plethScale = rowH * 0.28;
 
         // Slot 4 (NIBP) has no waveform trace
 
         const etco2CenterY = rowH * 4.62; // Slot 5 (EtCO2 CAPNOGRAM)
-        const etco2Scale = rowH * 0.35;
+        const etco2Scale = rowH * 0.28;
 
         const respCenterY = rowH * 5.62;  // Slot 6 (RESP WAVE)
-        const respScale = rowH * 0.32;
+        const respScale = rowH * 0.25;
 
-        // Render 5 Traces with Crisp, Bold Lines
-        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.2);
-        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 2.0);
-        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 2.0);
-        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 2.0);
-        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 2.0);
+        // Render Traces (ECG Lead II has 3.0px bold line & glow so it stands out above the rest)
+        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 3.0, 5);
+        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 1.8, 0);
+        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 1.8, 0);
+        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 1.8, 0);
+        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 1.8, 0);
 
         // Sweep Bar
         if (!this.isFrozen) {
@@ -260,14 +260,14 @@ class MonitorCanvasEngine {
         }
     }
 
-    drawTrace(buffer, centerY, scale, color, lineW = 1.8) {
+    drawTrace(buffer, centerY, scale, color, lineW = 1.8, shadowBlur = 3) {
         const w = this.canvas.width;
         if (!buffer || buffer.length === 0) return;
 
         this.ctx.lineWidth = lineW;
         this.ctx.strokeStyle = color;
         this.ctx.shadowColor = color;
-        this.ctx.shadowBlur = 3;
+        this.ctx.shadowBlur = shadowBlur;
         this.ctx.beginPath();
 
         let started = false;
