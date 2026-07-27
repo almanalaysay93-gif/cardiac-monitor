@@ -173,32 +173,32 @@ class MonitorCanvasEngine {
 
         this.drawGrid();
 
-        // 5 Channel Layout Heights (Shifted downward for top headroom & scaled larger)
+        // 5 Channel Layout Heights (Guaranteed top headroom & clear margins)
         const rowH = h / 6.0;
 
-        const ecgCenterY = rowH * 0.58;   // Shifted downward to give top R-peak breathing room
-        const ecgScale = (rowH * 0.52) * this.gain; // Prominent, larger ECG waves
+        const ecgCenterY = rowH * 0.65;   // Lowered baseline to ensure R-peaks NEVER touch the top edge
+        const ecgScale = (rowH * 0.38) * this.gain; // Prominent, clear ECG waves with 25px top clearance
 
-        const alineCenterY = rowH * 1.58; // Slot 2 (ART IBP)
-        const alineScale = rowH * 0.45;
+        const alineCenterY = rowH * 1.62; // Slot 2 (ART IBP)
+        const alineScale = rowH * 0.36;
 
-        const plethCenterY = rowH * 2.58; // Slot 3 (SpO2 PLETH)
-        const plethScale = rowH * 0.42;
+        const plethCenterY = rowH * 2.62; // Slot 3 (SpO2 PLETH)
+        const plethScale = rowH * 0.35;
 
         // Slot 4 (NIBP) has no waveform trace
 
-        const etco2CenterY = rowH * 4.58; // Slot 5 (EtCO2 CAPNOGRAM)
-        const etco2Scale = rowH * 0.42;
+        const etco2CenterY = rowH * 4.62; // Slot 5 (EtCO2 CAPNOGRAM)
+        const etco2Scale = rowH * 0.35;
 
-        const respCenterY = rowH * 5.58;  // Slot 6 (RESP WAVE)
-        const respScale = rowH * 0.38;
+        const respCenterY = rowH * 5.62;  // Slot 6 (RESP WAVE)
+        const respScale = rowH * 0.32;
 
-        // Render 5 Traces with Thicker, Vibrant Lines
-        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.4);
-        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 2.2);
-        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 2.2);
-        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 2.2);
-        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 2.2);
+        // Render 5 Traces with Crisp, Bold Lines
+        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.2);
+        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 2.0);
+        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 2.0);
+        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 2.0);
+        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 2.0);
 
         // Sweep Bar
         if (!this.isFrozen) {
