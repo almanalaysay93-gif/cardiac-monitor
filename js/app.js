@@ -324,6 +324,9 @@ class CardiacMonitorApp {
         }, 1500);
     }
 
+    evaluateAlarms(rhythm) {
+        const banner = document.getElementById('alarmBanner');
+
         if (rhythm === 'asystole') {
             if (banner) {
                 banner.className = 'alarm-banner high-alarm';
