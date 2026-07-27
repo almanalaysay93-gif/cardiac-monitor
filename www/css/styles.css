@@ -143,10 +143,64 @@ body {
     height: calc(100vh - 60px);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1024px) and (min-height: 600px) {
     .main-container {
         grid-template-columns: 1fr;
         height: auto;
+    }
+}
+
+/* Mobile Phone Landscape Optimization */
+@media (orientation: landscape) and (max-height: 520px) {
+    .monitor-header {
+        padding: 4px 10px;
+    }
+    .brand-title h1 {
+        font-size: 0.95rem;
+    }
+    .brand-badge {
+        display: none;
+    }
+    .patient-info {
+        font-size: 0.72rem;
+        gap: 8px;
+    }
+    .header-actions .btn {
+        padding: 3px 6px;
+        font-size: 0.7rem;
+    }
+    .main-container {
+        grid-template-columns: 1fr 240px !important;
+        height: calc(100vh - 40px) !important;
+        padding: 4px !important;
+        gap: 6px !important;
+    }
+    .monitor-body-wrap {
+        grid-template-columns: 1fr 140px !important;
+    }
+    .vitals-column {
+        padding: 4px;
+        gap: 4px;
+    }
+    .vital-box {
+        padding: 2px 6px;
+    }
+    .vital-box .vital-value {
+        font-size: 1.3rem !important;
+    }
+    .vital-box .vital-header {
+        font-size: 0.62rem;
+    }
+    .vital-box .vital-unit {
+        font-size: 0.6rem;
+    }
+    .control-tabs .tab-btn {
+        padding: 8px 4px;
+        font-size: 0.7rem;
+    }
+    .rhythm-btn, .med-btn {
+        padding: 6px 4px;
+        font-size: 0.7rem;
     }
 }
 
