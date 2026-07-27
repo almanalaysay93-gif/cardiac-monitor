@@ -173,29 +173,29 @@ class MonitorCanvasEngine {
 
         this.drawGrid();
 
-        // 5 Channel Layout Heights (ECG HR trace rendered BIGGER & more prominent than all others)
+        // 5 Channel Layout Heights (ART Blood Pressure in Row 1 Top, ECG in Row 2)
         const rowH = h / 6.0;
 
-        const ecgCenterY = rowH * 0.68;   // Baseline lowered for top clearance
-        const ecgScale = (rowH * 0.44) * this.gain; // Primary ECG HR waveform: BIGGER & taller amplitude!
+        const alineCenterY = rowH * 0.58; // Slot 1 (Top: ART Blood Pressure)
+        const alineScale = rowH * 0.38;
 
-        const alineCenterY = rowH * 1.62; // Slot 2 (ART IBP)
-        const alineScale = rowH * 0.30;
+        const ecgCenterY = rowH * 1.62;   // Slot 2 (HR / ECG Lead II)
+        const ecgScale = (rowH * 0.44) * this.gain;
 
         const plethCenterY = rowH * 2.62; // Slot 3 (SpO2 PLETH)
-        const plethScale = rowH * 0.28;
+        const plethScale = rowH * 0.35;
 
-        // Slot 4 (NIBP) has no waveform trace
+        // Slot 4 (NIBP) has no continuous waveform trace
 
         const etco2CenterY = rowH * 4.62; // Slot 5 (EtCO2 CAPNOGRAM)
-        const etco2Scale = rowH * 0.28;
+        const etco2Scale = rowH * 0.35;
 
         const respCenterY = rowH * 5.62;  // Slot 6 (RESP WAVE)
-        const respScale = rowH * 0.25;
+        const respScale = rowH * 0.32;
 
         // Render 5 Traces with 100% UNIFORM line thickness (2.0px) across all channels
-        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.0, 3);
         this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 2.0, 3);
+        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.0, 3);
         this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 2.0, 3);
         this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 2.0, 3);
         this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 2.0, 3);
@@ -236,13 +236,14 @@ class MonitorCanvasEngine {
             this.drawCalipers();
         }
 
-        // Trace Labels (Clean Top Padding)
+        // Trace Labels (Clean Top Padding, Aligned 1:1 with Rows)
         this.ctx.font = '11px "Roboto Mono", monospace';
-        this.ctx.fillStyle = 'rgba(0, 255, 102, 0.85)';
-        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, 15);
-
+        
         this.ctx.fillStyle = 'rgba(255, 77, 77, 0.85)';
-        this.ctx.fillText('ART (A-LINE IBP)', 15, rowH * 1.0 + 15);
+        this.ctx.fillText('ART (A-LINE IBP)', 15, 15);
+
+        this.ctx.fillStyle = 'rgba(0, 255, 102, 0.85)';
+        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, rowH * 1.0 + 15);
 
         this.ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
         this.ctx.fillText('SpO2 PLETH', 15, rowH * 2.0 + 15);
