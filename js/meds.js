@@ -92,6 +92,9 @@ class MedicationController {
 
         if (meds[medKey]) {
             meds[medKey].action();
+            if (this.app && this.app.scenarios) {
+                this.app.scenarios.notifyAction(medKey);
+            }
             this.app.updateVitalsDisplay();
         }
     }

@@ -19,7 +19,7 @@
     <header class="monitor-header">
         <div class="brand-title">
             <h1>CARDIAC GUARD</h1>
-            <span class="brand-badge">ICU Telemetry v4.0</span>
+            <span class="brand-badge">ICU Telemetry v4.5</span>
         </div>
 
         <div class="patient-info">
@@ -66,11 +66,16 @@
                     <span class="quickbar-label">🏥 CASES:</span>
                     <select id="quickScenarioSelect" class="quick-select">
                         <option value="">Select Case Scenario...</option>
-                        <option value="stemi_case">Case 1: Inferior STEMI</option>
-                        <option value="vfib_case">Case 2: Pulseless VFib</option>
-                        <option value="avblock_case">Case 3: 3rd Deg AV Block</option>
-                        <option value="vtach_case">Case 4: Unstable VTach</option>
+                        <option value="stemi_case">Case 1: Inferior STEMI (120s)</option>
+                        <option value="vfib_case">Case 2: Pulseless VFib (60s)</option>
+                        <option value="avblock_case">Case 3: 3rd Deg AV Block (90s)</option>
+                        <option value="vtach_case">Case 4: Unstable VTach (75s)</option>
+                        <option value="torsades_case">Case 5: Torsades de Pointes (60s)</option>
+                        <option value="anaphylaxis_case">Case 6: Anaphylactic Shock (90s)</option>
+                        <option value="pea_case">Case 7: PEA Cardiac Arrest (90s)</option>
+                        <option value="hyperkalemia_case">Case 8: Hyperkalemic Brady (100s)</option>
                     </select>
+                    <span class="scenario-timer-display">⏱️ 00:00</span>
                     <button id="quick12LeadBtn" class="btn btn-warning">🫀 12-Lead</button>
                 </div>
             </div>
@@ -300,29 +305,52 @@
             <!-- Tab 5: Clinical Emergency Scenarios -->
             <div id="tabScenarios" class="tab-content">
                 <div style="margin-bottom:10px;">
-                    <h4 id="scenarioTitle" style="font-size:0.85rem; color:#38bdf8;">ACLS Clinical Cases</h4>
-                    <p id="scenarioHistory" style="font-size:0.75rem; color:#cbd5e1; margin-top:4px;">Select a clinical case below to start simulation:</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4 id="scenarioTitle" style="font-size:0.85rem; color:#38bdf8;">ACLS Clinical Cases</h4>
+                        <span class="scenario-timer-display" style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:#ff3366;">⏱️ 00:00</span>
+                    </div>
+                    <p id="scenarioHistory" style="font-size:0.75rem; color:#cbd5e1; margin-top:4px;">Select an emergency case below to start simulation:</p>
                     <div id="scenarioGuide" style="font-size:0.75rem; color:#ffeb3b; margin-top:6px; font-weight:700;"></div>
                 </div>
 
                 <div class="scenario-card" data-scenario="stemi_case">
-                    <h4>Case 1: Acute Inferior STEMI</h4>
+                    <h4>Case 1: Acute Inferior STEMI (120s Timer)</h4>
                     <p>62yo Male with crushing chest pressure. Inspect 12-Lead ECG & give Nitroglycerin.</p>
                 </div>
 
                 <div class="scenario-card" data-scenario="vfib_case">
-                    <h4>Case 2: Pulseless VFib Cardiac Arrest</h4>
-                    <p>55yo Female sudden collapse. High priority alarm! Charge Defib 200J & give Epinephrine.</p>
+                    <h4>Case 2: Pulseless VFib Cardiac Arrest (60s Timer)</h4>
+                    <p>55yo Female sudden collapse. High alarm! Charge Defib 200J & deliver shock!</p>
                 </div>
 
                 <div class="scenario-card" data-scenario="avblock_case">
-                    <h4>Case 3: Symptomatic 3rd Deg AV Block</h4>
+                    <h4>Case 3: Symptomatic 3rd Deg AV Block (90s Timer)</h4>
                     <p>78yo Male severe presyncope & hypotension. Give Atropine or use Pacemaker.</p>
                 </div>
 
                 <div class="scenario-card" data-scenario="vtach_case">
-                    <h4>Case 4: Unstable Ventricular Tachycardia</h4>
+                    <h4>Case 4: Unstable Ventricular Tachycardia (75s Timer)</h4>
                     <p>68yo Female palpitations. Perform Sync Cardioversion (100J) or give Amiodarone.</p>
+                </div>
+
+                <div class="scenario-card" data-scenario="torsades_case">
+                    <h4>Case 5: Torsades de Pointes (60s Timer)</h4>
+                    <p>45yo Male with long QTc collapsing into undulating VTach. Deliver Defib Shock!</p>
+                </div>
+
+                <div class="scenario-card" data-scenario="anaphylaxis_case">
+                    <h4>Case 6: Anaphylactic Shock & Hypoxia (90s Timer)</h4>
+                    <p>28yo Female with bee sting allergy & stridor. Give Epinephrine & Saline Bolus.</p>
+                </div>
+
+                <div class="scenario-card" data-scenario="pea_case">
+                    <h4>Case 7: Pulseless Electrical Activity (90s Timer)</h4>
+                    <p>50yo Male in cardiac arrest with sinus ECG but NO pulse. Give Epi & Saline!</p>
+                </div>
+
+                <div class="scenario-card" data-scenario="hyperkalemia_case">
+                    <h4>Case 8: Hyperkalemic Bradycardia (100s Timer)</h4>
+                    <p>65yo Dialysis patient with serum K+ 7.8 mEq/L. Push Atropine or Saline Bolus.</p>
                 </div>
             </div>
 

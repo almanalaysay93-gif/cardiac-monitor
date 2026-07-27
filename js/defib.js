@@ -75,7 +75,10 @@ class DefibController {
             }
         }
 
-        if (this.app) this.app.updateDefibUI();
+        if (this.app) {
+            if (this.app.scenarios) this.app.scenarios.notifyAction('shock');
+            this.app.updateDefibUI();
+        }
         return true;
     }
 
