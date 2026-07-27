@@ -269,7 +269,7 @@ class WaveformGenerator {
             case 'vtach': {
                 const vtachFreq = (effectiveBpm / 60.0);
                 const vtPhase = (this.time * vtachFreq) % 1.0;
-                ecg = Math.sin(vtPhase * Math.PI * 2) * 0.9 + this.gaussian(vtPhase, 1.2, 0.3, 0.05) - 0.2;
+                ecg = (Math.sin(vtPhase * Math.PI * 2) * 0.75 + this.gaussian(vtPhase, 0.8, 0.3, 0.05)) * 0.65;
                 if (vtPhase > 0.28 && vtPhase < 0.32 && !this.justTriggeredR) this.justTriggeredR = true;
                 break;
             }
@@ -306,10 +306,10 @@ class WaveformGenerator {
             }
             case 'torsades': {
                 this.torsadesPhase += dt * 0.8;
-                const ampMod = 0.3 + 0.9 * Math.abs(Math.sin(this.torsadesPhase));
+                const ampMod = 0.25 + 0.60 * Math.abs(Math.sin(this.torsadesPhase));
                 const vtachFreq = (effectiveBpm / 60.0);
                 const vtPhase = (this.time * vtachFreq) % 1.0;
-                ecg = (Math.sin(vtPhase * Math.PI * 2) * 0.8 + this.gaussian(vtPhase, 1.1, 0.3, 0.06)) * ampMod;
+                ecg = (Math.sin(vtPhase * Math.PI * 2) * 0.75 + this.gaussian(vtPhase, 0.8, 0.3, 0.06)) * ampMod;
                 if (vtPhase > 0.28 && vtPhase < 0.32 && !this.justTriggeredR) this.justTriggeredR = true;
                 break;
             }
