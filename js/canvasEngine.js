@@ -193,12 +193,12 @@ class MonitorCanvasEngine {
         const respCenterY = rowH * 5.62;  // Slot 6 (RESP WAVE)
         const respScale = rowH * 0.25;
 
-        // Render Traces (ECG Lead II has 3.0px bold line & glow so it stands out above the rest)
-        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 3.0, 5);
-        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 1.8, 0);
-        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 1.8, 0);
-        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 1.8, 0);
-        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 1.8, 0);
+        // Render 5 Traces with 100% UNIFORM line thickness (2.0px) across all channels
+        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.0, 3);
+        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 2.0, 3);
+        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 2.0, 3);
+        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 2.0, 3);
+        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 2.0, 3);
 
         // Sweep Bar
         if (!this.isFrozen) {
