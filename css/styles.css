@@ -694,3 +694,55 @@ body.fullscreen-active .exit-fullscreen-btn {
     color: #94a3b8;
     line-height: 1.3;
 }
+
+/* Fullscreen Emergency Resuscitation Quick-Bar */
+.fullscreen-quickbar {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    padding: 8px 18px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 99;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+body.fullscreen-active .fullscreen-quickbar {
+    display: flex;
+}
+
+.quickbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quickbar-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-right: 2px;
+}
+
+.quick-select {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+.quick-select option {
+    background: #0f172a;
+    color: #f1f5f9;
+}

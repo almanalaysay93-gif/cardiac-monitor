@@ -44,8 +44,38 @@
         <!-- Bedside Monitor Frame & Canvas -->
         <div class="monitor-bezel">
             
-            <!-- Exit Fullscreen Overlay Button -->
-            <button id="exitFullscreenBtn" class="exit-fullscreen-btn" title="Exit Full View (Esc)">✕ Exit Full View</button>
+            <!-- Fullscreen Emergency Resuscitation Quick-Bar -->
+            <div id="fullscreenQuickBar" class="fullscreen-quickbar">
+                <div class="quickbar-group">
+                    <span class="quickbar-label">⚡ DEFIB:</span>
+                    <button class="btn btn-warning quick-charge-btn">CHARGE CAPACITOR</button>
+                    <button class="btn quick-shock-btn" disabled>⚡ SHOCK</button>
+                    <button class="btn quick-sync-btn">SYNC: OFF</button>
+                </div>
+
+                <div class="quickbar-group">
+                    <span class="quickbar-label">💉 MEDS:</span>
+                    <button class="btn btn-primary" data-med="epi">Epi 1mg</button>
+                    <button class="btn btn-primary" data-med="amiodarone">Amio 300mg</button>
+                    <button class="btn btn-primary" data-med="atropine">Atropine</button>
+                    <button class="btn btn-primary" data-med="adenosine">Adenosine</button>
+                    <button class="btn btn-primary" data-med="nitro">Nitro</button>
+                </div>
+
+                <div class="quickbar-group">
+                    <span class="quickbar-label">🏥 CASES:</span>
+                    <select id="quickScenarioSelect" class="quick-select">
+                        <option value="">Select Case Scenario...</option>
+                        <option value="stemi_case">Case 1: Inferior STEMI</option>
+                        <option value="vfib_case">Case 2: Pulseless VFib</option>
+                        <option value="avblock_case">Case 3: 3rd Deg AV Block</option>
+                        <option value="vtach_case">Case 4: Unstable VTach</option>
+                    </select>
+                    <button id="quick12LeadBtn" class="btn btn-warning">🫀 12-Lead</button>
+                </div>
+
+                <button id="exitFullscreenBtn" class="exit-fullscreen-btn" title="Exit Full View (Esc)">✕ Exit Full View</button>
+            </div>
 
             <!-- Alarm Banner -->
             <div id="alarmBanner" class="alarm-banner">CRITICAL CARDIAC ALARM</div>

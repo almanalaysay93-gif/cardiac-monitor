@@ -101,7 +101,7 @@ class CardiacMonitorApp {
             });
         });
 
-        // Medication Buttons
+        // Medication Buttons (Works both in sidebar and fullscreen quickbar)
         document.querySelectorAll('[data-med]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const medKey = btn.getAttribute('data-med');
@@ -109,13 +109,40 @@ class CardiacMonitorApp {
             });
         });
 
-        // Clinical Scenario Cards
+        // Clinical Scenario Cards & Quick Select
         document.querySelectorAll('[data-scenario]').forEach(card => {
             card.addEventListener('click', () => {
                 const scenarioKey = card.getAttribute('data-scenario');
                 this.scenarios.loadScenario(scenarioKey);
             });
         });
+
+        const qScenario = document.getElementById('quickScenarioSelect');
+        if (qScenario) {
+            qScenario.addEventListener('change', (e) => {
+                if (e.target.value) this.scenarios.loadScenario(e.target.value);
+            });
+        }
+
+        // Quick Bar Defib Controls
+        const qCharge = document.querySelector('.quick-charge-btn');
+        const qShock = document.querySelector('.quick-shock-btn');
+        const qSync = document.querySelector('.quick-sync-btn');
+        const q12Lead = document.getElementById('quick12LeadBtn');
+
+        if (qCharge) qCharge.addEventListener('click', () => { this.defib.charge(); qCharge.innerText = 'CHARGING...'; });
+        if (qShock) qShock.addEventListener('click', () => { this.defib.deliverShock(); });
+        if (qSync) qSync.addEventListener('click', () => {
+            const isSync = this.defib.toggleSyncMode();
+            qSync.classList.toggle('btn-warning', isSync);
+            qSync.innerText = isSync ? 'SYNC: ON' : 'SYNC: OFF';
+            const syncBtn = document.getElementById('syncBtn');
+            if (syncBtn) {
+                syncBtn.classList.toggle('btn-warning', isSync);
+                syncBtn.innerText = isSync ? 'SYNC: ON' : 'SYNC: OFF';
+            }
+        });
+        if (q12Lead) q12Lead.addEventListener('click', () => this.leads12.show());
 
         // BPM Slider
         const bpmSlider = document.getElementById('bpmSlider');
@@ -349,20 +376,32 @@ class CardiacMonitorApp {
     updateDefibUI() {
         const chargeBtn = document.getElementById('defibChargeBtn');
         const shockBtn = document.getElementById('defibShockBtn');
+        const qCharge = document.querySelector('.quick-charge-btn');
+        const qShock = document.querySelector('.quick-shock-btn');
         const statusEl = document.getElementById('defibStatusText');
 
         if (this.defib.isCharged) {
             if (chargeBtn) chargeBtn.innerText = 'CHARGED ⚡';
+            if (qCharge) qCharge.innerText = 'CHARGED ⚡';
             if (shockBtn) {
                 shockBtn.disabled = false;
                 shockBtn.classList.add('btn-danger');
             }
+            if (qShock) {
+                qShock.disabled = false;
+                qShock.classList.add('btn-danger');
+            }
             if (statusEl) statusEl.innerText = `CAPACITOR CHARGED: ${this.defib.selectedJoules} JOULES`;
         } else {
             if (chargeBtn) chargeBtn.innerText = 'CHARGE CAPACITOR';
+            if (qCharge) qCharge.innerText = 'CHARGE CAPACITOR';
             if (shockBtn) {
                 shockBtn.disabled = true;
                 shockBtn.classList.remove('btn-danger');
+            }
+            if (qShock) {
+                qShock.disabled = true;
+                qShock.classList.remove('btn-danger');
             }
             if (statusEl) statusEl.innerText = 'DEFIBRILLATOR READY';
         }
