@@ -173,21 +173,25 @@ class MonitorCanvasEngine {
 
         this.drawGrid();
 
-        // 5 Channel Layout Heights
-        const ecgCenterY = h * 0.22;
-        const ecgScale = (h * 0.12) * this.gain;
+        // 5 Channel Layout Heights (Aligned 1:1 with 6-row Vitals Grid)
+        const rowH = h / 6.0;
 
-        const alineCenterY = h * 0.44;
-        const alineScale = h * 0.08;
+        const ecgCenterY = rowH * 0.5;   // Slot 1 (HR / PR)
+        const ecgScale = (rowH * 0.40) * this.gain;
 
-        const plethCenterY = h * 0.62;
-        const plethScale = h * 0.07;
+        const alineCenterY = rowH * 1.5; // Slot 2 (ART IBP)
+        const alineScale = rowH * 0.35;
 
-        const etco2CenterY = h * 0.78;
-        const etco2Scale = h * 0.07;
+        const plethCenterY = rowH * 2.5; // Slot 3 (SpO2 PLETH)
+        const plethScale = rowH * 0.32;
 
-        const respCenterY = h * 0.92;
-        const respScale = h * 0.05;
+        // Slot 4 (NIBP) has no waveform trace
+
+        const etco2CenterY = rowH * 4.5; // Slot 5 (EtCO2 CAPNOGRAM)
+        const etco2Scale = rowH * 0.32;
+
+        const respCenterY = rowH * 5.5;  // Slot 6 (RESP WAVE)
+        const respScale = rowH * 0.28;
 
         // Render 5 Traces
         this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.0);
@@ -232,22 +236,22 @@ class MonitorCanvasEngine {
             this.drawCalipers();
         }
 
-        // Trace Labels
+        // Trace Labels (Positioned Flush with Each Row Baseline)
         this.ctx.font = '11px "Roboto Mono", monospace';
         this.ctx.fillStyle = 'rgba(0, 255, 102, 0.85)';
-        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, 20);
+        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, 16);
 
         this.ctx.fillStyle = 'rgba(255, 77, 77, 0.85)';
-        this.ctx.fillText('ART (A-LINE IBP)', 15, h * 0.36);
+        this.ctx.fillText('ART (A-LINE IBP)', 15, rowH * 1.0 + 16);
 
         this.ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
-        this.ctx.fillText('SpO2 PLETH', 15, h * 0.54);
+        this.ctx.fillText('SpO2 PLETH', 15, rowH * 2.0 + 16);
 
         this.ctx.fillStyle = 'rgba(216, 180, 254, 0.85)';
-        this.ctx.fillText('EtCO2 CAPNOGRAM', 15, h * 0.70);
+        this.ctx.fillText('EtCO2 CAPNOGRAM', 15, rowH * 4.0 + 16);
 
         this.ctx.fillStyle = 'rgba(255, 235, 59, 0.85)';
-        this.ctx.fillText('RESP WAVE', 15, h * 0.86);
+        this.ctx.fillText('RESP WAVE', 15, rowH * 5.0 + 16);
 
         if (this.isFrozen) {
             this.ctx.font = 'bold 16px "Roboto Mono", monospace';

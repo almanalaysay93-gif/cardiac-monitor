@@ -334,10 +334,11 @@ class WaveformGenerator {
     generatePlethSample(p, rhythm) {
         if (rhythm === 'asystole' || rhythm === 'vfib') return 0.02 + (Math.random() - 0.5) * 0.01;
         let val = 0;
-        if (p >= 0.3 && p <= 0.85) {
-            const sysP = (p - 0.3) / 0.55;
+        // SpO2 PPG pulse starts at p = 0.38 (distal capillary arrival after A-Line)
+        if (p >= 0.38 && p <= 0.88) {
+            const sysP = (p - 0.38) / 0.50;
             val = Math.sin(sysP * Math.PI) * 0.85;
-            if (sysP > 0.35 && sysP < 0.6) val += Math.sin((sysP - 0.35) * Math.PI * 4) * 0.12;
+            if (sysP > 0.35 && sysP < 0.6) val += Math.sin((sysP - 0.35) * Math.PI * 4) * 0.10;
         }
         return Math.max(0, val);
     }
@@ -378,16 +379,17 @@ class WaveformGenerator {
         if (rhythm === 'asystole' || rhythm === 'vfib') return 0.05 + (Math.random() - 0.5) * 0.02;
 
         let val = 0.1; // Diastolic baseline
-        if (p >= 0.3 && p <= 0.80) {
-            const sysP = (p - 0.3) / 0.50;
-            if (sysP < 0.25) {
-                val = 0.1 + (sysP / 0.25) * 0.85; // Rapid systolic rise
-            } else if (sysP < 0.45) {
-                val = 0.95 - ((sysP - 0.25) / 0.2) * 0.35; // Systolic peak decay
-            } else if (sysP < 0.55) {
-                val = 0.60 + Math.sin((sysP - 0.45) * Math.PI * 10) * 0.1; // Dicrotic notch!
+        // A-Line arterial upstroke starts at p = 0.33 (immediately after R-peak at p = 0.30)
+        if (p >= 0.33 && p <= 0.80) {
+            const sysP = (p - 0.33) / 0.47;
+            if (sysP < 0.20) {
+                val = 0.1 + (sysP / 0.20) * 0.85; // Rapid systolic upstroke
+            } else if (sysP < 0.40) {
+                val = 0.95 - ((sysP - 0.20) / 0.20) * 0.30; // Systolic peak decay
+            } else if (sysP < 0.50) {
+                val = 0.65 + Math.sin((sysP - 0.40) * Math.PI * 10) * 0.12; // Dicrotic notch!
             } else {
-                val = 0.60 - ((sysP - 0.55) / 0.45) * 0.50; // Diastolic decay
+                val = 0.65 - ((sysP - 0.50) / 0.50) * 0.55; // Diastolic decay
             }
         }
         return Math.max(0.05, val);
