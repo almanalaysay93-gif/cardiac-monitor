@@ -33,6 +33,48 @@ class CardiacMonitorApp {
             });
         });
 
+        // Fullscreen Toggle Controls
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+
+        const toggleFullscreen = (enable) => {
+            const isFull = enable !== undefined ? enable : !document.body.classList.contains('fullscreen-active');
+            
+            if (isFull) {
+                document.body.classList.add('fullscreen-active');
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                }
+                this.showNotification('Full View Mode Activated (Press Esc to Exit)', 'info');
+            } else {
+                document.body.classList.remove('fullscreen-active');
+                if (document.fullscreenElement && document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+            }
+
+            // Force canvas resize to update buffer resolution instantly
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 100);
+        };
+
+        if (fullscreenBtn) fullscreenBtn.addEventListener('click', () => toggleFullscreen(true));
+        if (exitFullscreenBtn) exitFullscreenBtn.addEventListener('click', () => toggleFullscreen(false));
+
+        // Sync with browser native fullscreen change & Esc key
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('fullscreen-active');
+                window.dispatchEvent(new Event('resize'));
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('fullscreen-active')) {
+                toggleFullscreen(false);
+            }
+        });
+
         // Rhythm Buttons
         document.querySelectorAll('.rhythm-btn').forEach(btn => {
             btn.addEventListener('click', () => {
