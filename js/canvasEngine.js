@@ -1,6 +1,6 @@
 /**
- * High Performance Canvas Renderer & Sweep Engine
- * Manages real-time multi-trace ECG/Pleth/Resp rendering, sweep bar, grid system, and measurement calipers.
+ * High Performance Multi-Trace Canvas Renderer & Sweep Engine
+ * Renders 5 simultaneous channels: ECG Lead II, SpO2 Pleth, Respiration, EtCO2 Capnography, and Arterial Line (A-Line / IBP).
  */
 
 class MonitorCanvasEngine {
@@ -13,28 +13,27 @@ class MonitorCanvasEngine {
         this.isRunning = true;
         this.isFrozen = false;
         this.showGrid = true;
-        this.gridType = 'green'; // 'green' or 'red'
+        this.gridType = 'green';
 
-        // Display properties
-        this.sweepSpeedMmPerSec = 25; // 12.5, 25, 50
-        this.pixelsPerMm = 4; // Scale factor for 1080p display
-        this.gain = 1.0; // 0.5x, 1x, 2x gain
+        this.sweepSpeedMmPerSec = 25;
+        this.pixelsPerMm = 4;
+        this.gain = 1.0;
 
-        // Sweep position tracking
         this.sweepX = 0;
-        this.clearWidth = 20; // Width of erasing sweep bar ahead
+        this.clearWidth = 20;
 
-        // Circular history buffers for rendering
+        // 5 Circular history buffers for rendering
         this.ecgBuffer = [];
         this.plethBuffer = [];
         this.respBuffer = [];
+        this.etco2Buffer = [];
+        this.alineBuffer = [];
         this.bufferLength = 0;
 
-        // Caliper measurement tool state
         this.caliperMode = false;
         this.caliper1X = null;
         this.caliper2X = null;
-        this.draggingCaliper = null; // 1 or 2
+        this.draggingCaliper = null;
 
         this.setupResize();
         this.bindCaliperEvents();
@@ -47,11 +46,12 @@ class MonitorCanvasEngine {
             this.canvas.height = rect.height;
             this.bufferLength = Math.ceil(this.canvas.width);
             
-            // Re-initialize buffers if needed
             if (this.ecgBuffer.length !== this.bufferLength) {
                 this.ecgBuffer = new Array(this.bufferLength).fill(0);
                 this.plethBuffer = new Array(this.bufferLength).fill(0);
                 this.respBuffer = new Array(this.bufferLength).fill(0);
+                this.etco2Buffer = new Array(this.bufferLength).fill(0);
+                this.alineBuffer = new Array(this.bufferLength).fill(0);
             }
             this.drawGrid();
         };
@@ -71,7 +71,6 @@ class MonitorCanvasEngine {
     toggleFreeze() {
         this.isFrozen = !this.isFrozen;
         if (this.isFrozen && this.caliperMode) {
-            // Default calipers to center if not set
             if (this.caliper1X === null) this.caliper1X = this.canvas.width * 0.35;
             if (this.caliper2X === null) this.caliper2X = this.canvas.width * 0.65;
         }
@@ -102,35 +101,28 @@ class MonitorCanvasEngine {
         const gridColorMajor = this.gridType === 'green' ? 'rgba(0, 255, 102, 0.15)' : 'rgba(255, 80, 80, 0.18)';
         const gridColorMinor = this.gridType === 'green' ? 'rgba(0, 255, 102, 0.05)' : 'rgba(255, 80, 80, 0.06)';
 
-        const mmPx = this.pixelsPerMm;
-        const smallGrid = mmPx; // 1mm
-        const largeGrid = mmPx * 5; // 5mm (0.2s at 25mm/s)
+        const smallGrid = this.pixelsPerMm;
+        const largeGrid = this.pixelsPerMm * 5;
 
-        // Draw minor grid lines
         this.ctx.lineWidth = 0.5;
         this.ctx.strokeStyle = gridColorMinor;
         this.ctx.beginPath();
         for (let x = 0; x < w; x += smallGrid) {
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, h);
+            this.ctx.moveTo(x, 0); this.ctx.lineTo(x, h);
         }
         for (let y = 0; y < h; y += smallGrid) {
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(w, y);
+            this.ctx.moveTo(0, y); this.ctx.lineTo(w, y);
         }
         this.ctx.stroke();
 
-        // Draw major grid lines
         this.ctx.lineWidth = 1.0;
         this.ctx.strokeStyle = gridColorMajor;
         this.ctx.beginPath();
         for (let x = 0; x < w; x += largeGrid) {
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, h);
+            this.ctx.moveTo(x, 0); this.ctx.lineTo(x, h);
         }
         for (let y = 0; y < h; y += largeGrid) {
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(w, y);
+            this.ctx.moveTo(0, y); this.ctx.lineTo(w, y);
         }
         this.ctx.stroke();
     }
@@ -142,12 +134,10 @@ class MonitorCanvasEngine {
         const h = this.canvas.height;
 
         if (!this.isFrozen) {
-            // Speed in pixels per frame
             const speedPxPerSec = this.sweepSpeedMmPerSec * this.pixelsPerMm;
             const pxToAdvance = speedPxPerSec * dt;
 
-            // Generate sample from math engine
-            const { ecg, pleth, resp, justTriggeredR } = this.generator.getNextSample(dt);
+            const { ecg, pleth, resp, etco2, aline, justTriggeredR } = this.generator.getNextSample(dt);
 
             if (justTriggeredR) {
                 this.audio.playQrsBeep(currentSpo2);
@@ -159,38 +149,44 @@ class MonitorCanvasEngine {
                 this.ecgBuffer[xIndex] = ecg;
                 this.plethBuffer[xIndex] = pleth;
                 this.respBuffer[xIndex] = resp;
+                this.etco2Buffer[xIndex] = etco2;
+                this.alineBuffer[xIndex] = aline;
 
                 this.sweepX = (this.sweepX + 1) % w;
             }
         }
 
-        // Render full display canvas
         this.drawGrid();
 
-        // Trace vertical offsets & scale factors
-        const ecgCenterY = h * 0.35;
-        const ecgScale = (h * 0.18) * this.gain;
+        // 5 Channel Layout Heights
+        const ecgCenterY = h * 0.22;
+        const ecgScale = (h * 0.12) * this.gain;
 
-        const plethCenterY = h * 0.72;
-        const plethScale = h * 0.10;
+        const alineCenterY = h * 0.44;
+        const alineScale = h * 0.08;
 
-        const respCenterY = h * 0.89;
-        const respScale = h * 0.07;
+        const plethCenterY = h * 0.62;
+        const plethScale = h * 0.07;
 
-        // Render Traces
-        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 'ECG Lead II', 2.0);
-        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 'SpO2 PPG', 1.8);
-        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 'Resp Wave', 1.8);
+        const etco2CenterY = h * 0.78;
+        const etco2Scale = h * 0.07;
 
-        // Draw Sweep Bar if not frozen
+        const respCenterY = h * 0.92;
+        const respScale = h * 0.05;
+
+        // Render 5 Traces
+        this.drawTrace(this.ecgBuffer, ecgCenterY, ecgScale, '#00ff66', 2.0);
+        this.drawTrace(this.alineBuffer, alineCenterY, alineScale, '#ff4d4d', 1.8);
+        this.drawTrace(this.plethBuffer, plethCenterY, plethScale, '#00e5ff', 1.8);
+        this.drawTrace(this.etco2Buffer, etco2CenterY, etco2Scale, '#d8b4fe', 1.8);
+        this.drawTrace(this.respBuffer, respCenterY, respScale, '#ffeb3b', 1.8);
+
+        // Sweep Bar
         if (!this.isFrozen) {
             const sweepIntX = Math.floor(this.sweepX);
-            
-            // Clear gap ahead of sweep bar
             this.ctx.fillStyle = '#050b07';
             this.ctx.fillRect(sweepIntX, 0, this.clearWidth, h);
 
-            // Redraw grid inside clear gap
             if (this.showGrid) {
                 this.ctx.save();
                 this.ctx.beginPath();
@@ -201,18 +197,15 @@ class MonitorCanvasEngine {
                 this.ctx.lineWidth = 1.0;
                 this.ctx.beginPath();
                 for (let x = Math.floor(sweepIntX / largeGrid) * largeGrid; x < sweepIntX + this.clearWidth; x += largeGrid) {
-                    this.ctx.moveTo(x, 0);
-                    this.ctx.lineTo(x, h);
+                    this.ctx.moveTo(x, 0); this.ctx.lineTo(x, h);
                 }
                 for (let y = 0; y < h; y += largeGrid) {
-                    this.ctx.moveTo(sweepIntX, y);
-                    this.ctx.lineTo(sweepIntX + this.clearWidth, y);
+                    this.ctx.moveTo(sweepIntX, y); this.ctx.lineTo(sweepIntX + this.clearWidth, y);
                 }
                 this.ctx.stroke();
                 this.ctx.restore();
             }
 
-            // Draw glowing vertical sweep cursor line
             const grad = this.ctx.createLinearGradient(sweepIntX, 0, sweepIntX - 10, 0);
             grad.addColorStop(0, 'rgba(0, 255, 102, 0.8)');
             grad.addColorStop(1, 'rgba(0, 255, 102, 0.0)');
@@ -220,21 +213,26 @@ class MonitorCanvasEngine {
             this.ctx.fillRect(sweepIntX - 10, 0, 10, h);
         }
 
-        // Draw Calipers if enabled
         if (this.caliperMode) {
             this.drawCalipers();
         }
 
-        // Draw Trace Labels
-        this.ctx.font = '12px "Roboto Mono", monospace';
-        this.ctx.fillStyle = 'rgba(0, 255, 102, 0.8)';
-        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, 25);
+        // Trace Labels
+        this.ctx.font = '11px "Roboto Mono", monospace';
+        this.ctx.fillStyle = 'rgba(0, 255, 102, 0.85)';
+        this.ctx.fillText(`II  1.0mV  ${this.sweepSpeedMmPerSec}mm/s  Gain:${this.gain}x`, 15, 20);
 
-        this.ctx.fillStyle = 'rgba(0, 229, 255, 0.8)';
-        this.ctx.fillText('SpO2 PLETH', 15, h * 0.63);
+        this.ctx.fillStyle = 'rgba(255, 77, 77, 0.85)';
+        this.ctx.fillText('ART (A-LINE IBP)', 15, h * 0.36);
 
-        this.ctx.fillStyle = 'rgba(255, 235, 59, 0.8)';
-        this.ctx.fillText('RESP', 15, h * 0.82);
+        this.ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
+        this.ctx.fillText('SpO2 PLETH', 15, h * 0.54);
+
+        this.ctx.fillStyle = 'rgba(216, 180, 254, 0.85)';
+        this.ctx.fillText('EtCO2 CAPNOGRAM', 15, h * 0.70);
+
+        this.ctx.fillStyle = 'rgba(255, 235, 59, 0.85)';
+        this.ctx.fillText('RESP WAVE', 15, h * 0.86);
 
         if (this.isFrozen) {
             this.ctx.font = 'bold 16px "Roboto Mono", monospace';
@@ -243,21 +241,20 @@ class MonitorCanvasEngine {
         }
     }
 
-    drawTrace(buffer, centerY, scale, color, label, lineW = 2.0) {
+    drawTrace(buffer, centerY, scale, color, lineW = 1.8) {
         const w = this.canvas.width;
         if (!buffer || buffer.length === 0) return;
 
         this.ctx.lineWidth = lineW;
         this.ctx.strokeStyle = color;
         this.ctx.shadowColor = color;
-        this.ctx.shadowBlur = 4;
+        this.ctx.shadowBlur = 3;
         this.ctx.beginPath();
 
         let started = false;
         const sweepIntX = Math.floor(this.sweepX);
 
         for (let x = 0; x < w; x++) {
-            // Skip the erase gap if sweeping
             if (!this.isFrozen && x >= sweepIntX && x < sweepIntX + this.clearWidth) {
                 started = false;
                 continue;
@@ -274,7 +271,7 @@ class MonitorCanvasEngine {
             }
         }
         this.ctx.stroke();
-        this.ctx.shadowBlur = 0; // reset
+        this.ctx.shadowBlur = 0;
     }
 
     drawCalipers() {
@@ -282,44 +279,37 @@ class MonitorCanvasEngine {
         const c1 = this.caliper1X;
         const c2 = this.caliper2X;
 
-        // Caliper vertical lines
         [c1, c2].forEach((cx, idx) => {
             this.ctx.strokeStyle = idx === 0 ? '#ffea00' : '#ff9100';
             this.ctx.lineWidth = 1.5;
             this.ctx.setLineDash([6, 4]);
             this.ctx.beginPath();
-            this.ctx.moveTo(cx, 0);
-            this.ctx.lineTo(cx, h);
+            this.ctx.moveTo(cx, 0); this.ctx.lineTo(cx, h);
             this.ctx.stroke();
-            this.ctx.setLineDash([]); // Reset line dash
+            this.ctx.setLineDash([]);
 
-            // Handles
             this.ctx.fillStyle = idx === 0 ? '#ffea00' : '#ff9100';
             this.ctx.beginPath();
             this.ctx.arc(cx, h / 2, 6, 0, Math.PI * 2);
             this.ctx.fill();
         });
 
-        // Horizontal measurement line between calipers
         const minX = Math.min(c1, c2);
         const maxX = Math.max(c1, c2);
         const dxPx = maxX - minX;
 
-        // Calculate time delta in ms (at 25mm/s: 1mm = 40ms, pixelsPerMm = 4px -> 1px = 10ms at 25mm/s)
         const mm = dxPx / this.pixelsPerMm;
         const sec = mm / this.sweepSpeedMmPerSec;
         const ms = Math.round(sec * 1000);
         const calcBpm = ms > 0 ? Math.round(60000 / ms) : 0;
 
-        // Draw measurement banner
         const midX = minX + dxPx / 2;
         const bannerY = h * 0.48;
 
         this.ctx.strokeStyle = '#ffffff';
         this.ctx.lineWidth = 1.0;
         this.ctx.beginPath();
-        this.ctx.moveTo(minX, bannerY);
-        this.ctx.lineTo(maxX, bannerY);
+        this.ctx.moveTo(minX, bannerY); this.ctx.lineTo(maxX, bannerY);
         this.ctx.stroke();
 
         this.ctx.fillStyle = 'rgba(10, 20, 15, 0.85)';
@@ -346,10 +336,8 @@ class MonitorCanvasEngine {
         const onDown = (e) => {
             if (!this.caliperMode) return;
             const x = getX(e);
-            const dist1 = Math.abs(x - this.caliper1X);
-            const dist2 = Math.abs(x - this.caliper2X);
-            if (dist1 < 25) this.draggingCaliper = 1;
-            else if (dist2 < 25) this.draggingCaliper = 2;
+            if (Math.abs(x - this.caliper1X) < 25) this.draggingCaliper = 1;
+            else if (Math.abs(x - this.caliper2X) < 25) this.draggingCaliper = 2;
         };
 
         const onMove = (e) => {

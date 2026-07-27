@@ -19,7 +19,7 @@
     <header class="monitor-header">
         <div class="brand-title">
             <h1>CARDIAC GUARD</h1>
-            <span class="brand-badge">Bedside Telemetry v3.5</span>
+            <span class="brand-badge">ICU Telemetry v4.0</span>
         </div>
 
         <div class="patient-info">
@@ -30,7 +30,8 @@
         </div>
 
         <div class="header-actions">
-            <button id="fullscreenBtn" class="btn btn-primary">🖥️ Fullscreen Mode</button>
+            <button id="open12LeadBtn" class="btn btn-warning">🫀 12-Lead ECG View</button>
+            <button id="fullscreenBtn" class="btn btn-primary">🖥️ Full View</button>
             <button id="freezeBtn" class="btn">⏸ Freeze</button>
             <button id="caliperBtn" class="btn">📏 Calipers</button>
             <button id="audioToggleBtn" class="btn">🔊 Audio On</button>
@@ -67,6 +68,16 @@
                     <div class="vital-unit">BPM</div>
                 </div>
 
+                <!-- Arterial Line (A-Line / IBP) -->
+                <div class="vital-box vital-aline">
+                    <div class="vital-header">
+                        <span>ART (IBP)</span>
+                        <span>mmHg</span>
+                    </div>
+                    <div id="alineValue" class="vital-value" style="font-size: 1.6rem; margin-top:2px;">120/80 (93)</div>
+                    <div class="vital-unit">LINE</div>
+                </div>
+
                 <!-- SpO2 -->
                 <div class="vital-box vital-spo2">
                     <div class="vital-header">
@@ -83,8 +94,18 @@
                         <span>NIBP</span>
                         <button id="nibpCycleBtn" style="background:none; border:none; color:#38bdf8; cursor:pointer; font-weight:700; font-size:0.7rem;">[START]</button>
                     </div>
-                    <div id="nibpValue" class="vital-value" style="font-size: 1.8rem; margin-top: 4px;">120/80 (93)</div>
+                    <div id="nibpValue" class="vital-value" style="font-size: 1.6rem; margin-top: 2px;">120/80 (93)</div>
                     <div class="vital-unit">mmHg</div>
+                </div>
+
+                <!-- EtCO2 Capnography -->
+                <div class="vital-box vital-etco2">
+                    <div class="vital-header">
+                        <span>EtCO2</span>
+                        <span>mmHg</span>
+                    </div>
+                    <div id="etco2Value" class="vital-value">38</div>
+                    <div class="vital-unit">CAPNO</div>
                 </div>
 
                 <!-- Respiration (RESP) -->
@@ -107,8 +128,10 @@
             <div class="control-tabs">
                 <button class="tab-btn active" data-tab="tabRhythms">Rhythms</button>
                 <button class="tab-btn" data-tab="tabControls">Vitals</button>
-                <button class="tab-btn" data-tab="tabDefib">Defib / ACLS</button>
-                <button class="tab-btn" data-tab="tabQuiz">Quiz Game</button>
+                <button class="tab-btn" data-tab="tabMeds">Meds / IV</button>
+                <button class="tab-btn" data-tab="tabDefib">Defib</button>
+                <button class="tab-btn" data-tab="tabScenarios">Scenarios</button>
+                <button class="tab-btn" data-tab="tabQuiz">Quiz</button>
             </div>
 
             <!-- Tab 1: Built-in Rhythm Library -->
@@ -186,7 +209,38 @@
                 </div>
             </div>
 
-            <!-- Tab 3: Defibrillator & ACLS Panel -->
+            <!-- Tab 3: Emergency Medications -->
+            <div id="tabMeds" class="tab-content">
+                <div class="rhythm-group-title">ACLS Resuscitation Meds</div>
+                <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+                    <button class="med-btn" data-med="epi">
+                        <span>💉 Epinephrine 1mg IV Push</span>
+                        <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">Boosts HR, contractility & vascular resistance</span>
+                    </button>
+                    <button class="med-btn" data-med="amiodarone">
+                        <span>💉 Amiodarone 300mg IV Bolus</span>
+                        <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">Converts VTach / VFib arrhythmias</span>
+                    </button>
+                    <button class="med-btn" data-med="atropine">
+                        <span>💉 Atropine 1mg IV Push</span>
+                        <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">Increases HR in severe Bradycardia / Blocks</span>
+                    </button>
+                    <button class="med-btn" data-med="adenosine">
+                        <span>⚡ Adenosine 6mg Rapid IV Push</span>
+                        <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">Transient AV block pause to reset Tachycardia</span>
+                    </button>
+                    <button class="med-btn" data-med="nitro">
+                        <span>💊 Nitroglycerin 0.4mg SL</span>
+                        <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">Relieves STEMI ST elevation & vasodilates</span>
+                    </button>
+                    <button class="med-btn" data-med="saline">
+                        <span>💧 IV Normal Saline 500mL Bolus</span>
+                        <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">Restores circulating blood volume & BP</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab 4: Defibrillator & ACLS Panel -->
             <div id="tabDefib" class="tab-content">
                 <div class="defib-card">
                     <div id="defibStatusText" class="defib-status">DEFIBRILLATOR READY</div>
@@ -208,7 +262,36 @@
                 </div>
             </div>
 
-            <!-- Tab 4: Interactive Rhythm Quiz Mode -->
+            <!-- Tab 5: Clinical Emergency Scenarios -->
+            <div id="tabScenarios" class="tab-content">
+                <div style="margin-bottom:10px;">
+                    <h4 id="scenarioTitle" style="font-size:0.85rem; color:#38bdf8;">ACLS Clinical Cases</h4>
+                    <p id="scenarioHistory" style="font-size:0.75rem; color:#cbd5e1; margin-top:4px;">Select a clinical case below to start simulation:</p>
+                    <div id="scenarioGuide" style="font-size:0.75rem; color:#ffeb3b; margin-top:6px; font-weight:700;"></div>
+                </div>
+
+                <div class="scenario-card" data-scenario="stemi_case">
+                    <h4>Case 1: Acute Inferior STEMI</h4>
+                    <p>62yo Male with crushing chest pressure. Inspect 12-Lead ECG & give Nitroglycerin.</p>
+                </div>
+
+                <div class="scenario-card" data-scenario="vfib_case">
+                    <h4>Case 2: Pulseless VFib Cardiac Arrest</h4>
+                    <p>55yo Female sudden collapse. High priority alarm! Charge Defib 200J & give Epinephrine.</p>
+                </div>
+
+                <div class="scenario-card" data-scenario="avblock_case">
+                    <h4>Case 3: Symptomatic 3rd Deg AV Block</h4>
+                    <p>78yo Male severe presyncope & hypotension. Give Atropine or use Pacemaker.</p>
+                </div>
+
+                <div class="scenario-card" data-scenario="vtach_case">
+                    <h4>Case 4: Unstable Ventricular Tachycardia</h4>
+                    <p>68yo Female palpitations. Perform Sync Cardioversion (100J) or give Amiodarone.</p>
+                </div>
+            </div>
+
+            <!-- Tab 6: Interactive Rhythm Quiz Mode -->
             <div id="tabQuiz" class="tab-content">
                 <div style="margin-bottom:14px;">
                     <h3 id="quizTitle" style="font-size:0.9rem; color:#38bdf8; margin-bottom:8px;">Clinical ECG Training Quiz</h3>
@@ -240,6 +323,9 @@
     <script src="js/waveforms.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/canvasEngine.js"></script>
+    <script src="js/leads12.js"></script>
+    <script src="js/meds.js"></script>
+    <script src="js/scenarios.js"></script>
     <script src="js/defib.js"></script>
     <script src="js/app.js"></script>
 

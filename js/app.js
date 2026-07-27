@@ -1,5 +1,5 @@
 /**
- * Main Cardiac Monitor Application Controller
+ * Main Cardiac Monitor Application Controller - Extended ICU Edition
  */
 
 class CardiacMonitorApp {
@@ -9,6 +9,9 @@ class CardiacMonitorApp {
         this.canvas = document.getElementById('monitorCanvas');
         this.engine = new window.MonitorCanvasEngine(this.canvas, this.generator, this.audio);
         this.defib = new window.DefibController(this.generator, this.audio, this.engine, this);
+        this.leads12 = new window.Diagnostic12LeadEngine(this.generator);
+        this.meds = new window.MedicationController(this.generator, this.audio, this);
+        this.scenarios = new window.ScenariosEngine(this.generator, this.audio, this);
 
         this.currentSpo2 = 98;
         this.currentNibp = { sys: 120, dia: 80, map: 93 };
@@ -29,9 +32,18 @@ class CardiacMonitorApp {
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 btn.classList.add('active');
                 const tabId = btn.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
+                const tabEl = document.getElementById(tabId);
+                if (tabEl) tabEl.classList.add('active');
             });
         });
+
+        // 12-Lead Modal Button
+        const open12LeadBtn = document.getElementById('open12LeadBtn');
+        if (open12LeadBtn) {
+            open12LeadBtn.addEventListener('click', () => {
+                this.leads12.show();
+            });
+        }
 
         // Fullscreen Toggle Controls
         const fullscreenBtn = document.getElementById('fullscreenBtn');
@@ -53,7 +65,6 @@ class CardiacMonitorApp {
                 }
             }
 
-            // Force canvas resize to update buffer resolution instantly
             setTimeout(() => {
                 window.dispatchEvent(new Event('resize'));
             }, 100);
@@ -62,7 +73,6 @@ class CardiacMonitorApp {
         if (fullscreenBtn) fullscreenBtn.addEventListener('click', () => toggleFullscreen(true));
         if (exitFullscreenBtn) exitFullscreenBtn.addEventListener('click', () => toggleFullscreen(false));
 
-        // Sync with browser native fullscreen change & Esc key
         document.addEventListener('fullscreenchange', () => {
             if (!document.fullscreenElement) {
                 document.body.classList.remove('fullscreen-active');
@@ -79,15 +89,31 @@ class CardiacMonitorApp {
         document.querySelectorAll('.rhythm-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const rhythmKey = btn.getAttribute('data-rhythm');
+                if (!rhythmKey) return;
                 this.selectRhythmUI(rhythmKey);
                 this.generator.setRhythm(rhythmKey);
 
-                // Update BPM slider to match rhythm default
                 document.getElementById('bpmSlider').value = this.generator.targetBpm;
                 document.getElementById('bpmVal').innerText = `${this.generator.targetBpm} BPM`;
                 
                 this.updateVitalsForRhythm(rhythmKey);
-                this.audio.init(); // Initialize audio context on click
+                this.audio.init();
+            });
+        });
+
+        // Medication Buttons
+        document.querySelectorAll('[data-med]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const medKey = btn.getAttribute('data-med');
+                this.meds.giveMedication(medKey);
+            });
+        });
+
+        // Clinical Scenario Cards
+        document.querySelectorAll('[data-scenario]').forEach(card => {
+            card.addEventListener('click', () => {
+                const scenarioKey = card.getAttribute('data-scenario');
+                this.scenarios.loadScenario(scenarioKey);
             });
         });
 
@@ -101,7 +127,7 @@ class CardiacMonitorApp {
             });
         }
 
-        // Gain Slider / Controls
+        // Gain Slider
         document.querySelectorAll('[data-gain]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('[data-gain]').forEach(b => b.classList.remove('active'));
@@ -126,9 +152,7 @@ class CardiacMonitorApp {
         if (audioBtn) {
             audioBtn.addEventListener('click', () => {
                 const isMuted = this.audio.toggleMute();
-                audioBtn.innerHTML = isMuted ? 
-                    '🔇 Muted' : 
-                    '🔊 Audio On';
+                audioBtn.innerHTML = isMuted ? '🔇 Muted' : '🔊 Audio On';
                 audioBtn.classList.toggle('btn-danger', isMuted);
             });
         }
@@ -224,12 +248,12 @@ class CardiacMonitorApp {
 
     selectRhythmUI(rhythmKey) {
         document.querySelectorAll('.rhythm-btn').forEach(b => {
+            if (b.classList.contains('quiz-option-btn')) return;
             b.classList.toggle('active', b.getAttribute('data-rhythm') === rhythmKey);
         });
     }
 
     updateVitalsForRhythm(rhythm) {
-        // Adjust SpO2 and Blood Pressure according to cardiac perfusion state
         switch (rhythm) {
             case 'vfib':
             case 'asystole':
@@ -305,16 +329,20 @@ class CardiacMonitorApp {
         const hrEl = document.getElementById('hrValue');
         const spo2El = document.getElementById('spo2Value');
         const nibpEl = document.getElementById('nibpValue');
+        const alineEl = document.getElementById('alineValue');
+        const etco2El = document.getElementById('etco2Value');
         const respEl = document.getElementById('respValue');
 
-        const currentBpm = (this.generator.currentRhythm === 'vfib' || this.generator.currentRhythm === 'asystole') ? 0 : this.generator.targetBpm;
+        const currentBpm = (this.generator.currentRhythm === 'vfib' || this.generator.currentRhythm === 'asystole') ? 0 : (this.generator.targetBpm + this.generator.medEffects.hrOffset);
 
-        if (hrEl) hrEl.innerText = currentBpm > 0 ? currentBpm : '---';
+        if (hrEl) hrEl.innerText = currentBpm > 0 ? Math.round(currentBpm) : '---';
         if (spo2El) spo2El.innerText = this.currentSpo2 > 0 ? `${this.currentSpo2}%` : '--%';
-        if (nibpEl) {
-            const { sys, dia, map } = this.currentNibp;
-            nibpEl.innerText = sys === 0 ? '---/---' : `${sys}/${dia} (${map})`;
-        }
+        
+        const { sys, dia, map } = this.currentNibp;
+        if (nibpEl) nibpEl.innerText = sys === 0 ? '---/---' : `${sys}/${dia} (${map})`;
+        if (alineEl) alineEl.innerText = sys === 0 ? '---/---' : `${sys}/${dia} (${map})`;
+
+        if (etco2El) etco2El.innerText = (this.generator.currentRhythm === 'asystole') ? '0' : '38';
         if (respEl) respEl.innerText = this.currentResp;
     }
 
