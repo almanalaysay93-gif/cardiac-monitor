@@ -161,103 +161,185 @@ body {
 /* ===== RESPONSIVE: Phone Landscape (short screens) ===== */
 @media (orientation: landscape) and (max-height: 600px) {
     .monitor-header {
-        padding: 3px 8px;
+        padding: 3px 6px;
     }
     .brand-title h1 {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
     .brand-badge {
         display: none;
     }
     .patient-info {
-        font-size: 0.65rem;
-        gap: 6px;
+        font-size: 0.6rem;
+        gap: 4px;
     }
     .patient-info span:nth-child(n+3) {
         display: none;
     }
-    .header-actions .btn {
-        padding: 2px 5px;
-        font-size: 0.65rem;
-    }
-    .main-container {
-        grid-template-columns: 1fr 200px;
-        padding: 3px;
-        gap: 3px;
-    }
-    .monitor-body-wrap {
-        grid-template-columns: 1fr 120px !important;
-    }
-    .vitals-column {
-        padding: 2px;
-        gap: 2px;
-    }
-    .vital-box {
-        padding: 1px 4px;
-        border-radius: 4px;
-    }
-    .vital-box .vital-value {
-        font-size: 1.1rem !important;
-    }
-    .vital-box .vital-header {
-        font-size: 0.55rem;
-    }
-    .vital-box .vital-unit {
-        font-size: 0.5rem;
-        display: none;
-    }
-    .control-tabs .tab-btn {
-        padding: 5px 3px;
-        font-size: 0.6rem;
-    }
-    .rhythm-btn, .med-btn {
-        padding: 4px 3px;
-        font-size: 0.62rem;
-    }
-    .control-sidebar {
-        min-height: 0;
-    }
-    .tab-content {
-        padding: 6px;
-    }
-}
-
-/* ===== RESPONSIVE: Very small phones landscape ===== */
-@media (orientation: landscape) and (max-height: 420px) {
-    .monitor-header {
-        padding: 2px 6px;
-    }
-    .brand-title h1 {
-        font-size: 0.75rem;
-    }
-    .patient-info {
-        display: none;
+    .header-actions {
+        gap: 4px;
     }
     .header-actions .btn {
         padding: 2px 4px;
         font-size: 0.6rem;
+        white-space: nowrap;
     }
     .main-container {
-        grid-template-columns: 1fr 170px;
+        grid-template-columns: 1fr 160px;
         padding: 2px;
         gap: 2px;
     }
     .monitor-body-wrap {
         grid-template-columns: 1fr 100px !important;
     }
+    .vitals-column {
+        padding: 2px;
+        gap: 2px;
+    }
+    .vital-box {
+        padding: 1px 3px;
+        border-radius: 4px;
+    }
     .vital-box .vital-value {
-        font-size: 0.95rem !important;
+        font-size: 1rem !important;
     }
     .vital-box .vital-header {
         font-size: 0.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .vital-box .vital-unit {
+        display: none;
+    }
+    .control-sidebar {
+        min-height: 0;
+        overflow: hidden;
+    }
+    .control-tabs {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
     }
     .control-tabs .tab-btn {
-        padding: 4px 2px;
+        padding: 4px 3px;
         font-size: 0.55rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .tab-content {
+        padding: 4px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .rhythm-btn, .med-btn {
+        padding: 4px 3px;
+        font-size: 0.58rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .rhythm-grid {
+        gap: 4px;
+    }
+    .defib-card {
+        padding: 6px;
+    }
+    .defib-status {
+        font-size: 0.7rem;
+        margin-bottom: 6px;
+    }
+    .joule-grid {
+        gap: 2px;
+        margin-bottom: 6px;
+    }
+    .joule-btn {
+        font-size: 0.6rem;
+        padding: 3px 0;
+    }
+    .defib-actions {
+        gap: 4px;
+    }
+    .defib-actions .btn {
+        font-size: 0.6rem;
+        padding: 4px 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    #defibShockBtn {
+        font-size: 0.65rem;
+        padding: 5px;
+    }
+    /* Fullscreen quickbar: scrollable, not clipped */
+    .fullscreen-quickbar {
+        padding: 4px 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+    .quickbar-group {
+        flex-shrink: 0;
+    }
+    .quickbar-group .btn {
+        padding: 2px 5px;
+        font-size: 0.6rem;
+    }
+    .quickbar-label {
+        font-size: 0.6rem;
+    }
+    .quick-select {
+        font-size: 0.6rem;
+        padding: 3px 6px;
+    }
+    /* Exit fullscreen button: smaller, no overlap with RESP */
+    .exit-fullscreen-btn {
+        bottom: 4px;
+        right: 4px;
+        padding: 3px 8px;
+        font-size: 0.6rem;
+        border-radius: 10px;
+    }
+}
+
+/* ===== RESPONSIVE: Very small phones landscape ===== */
+@media (orientation: landscape) and (max-height: 420px) {
+    .monitor-header {
+        padding: 2px 4px;
+    }
+    .brand-title h1 {
+        font-size: 0.7rem;
+    }
+    .patient-info {
+        display: none;
+    }
+    .header-actions .btn {
+        padding: 2px 3px;
+        font-size: 0.55rem;
+    }
+    .main-container {
+        grid-template-columns: 1fr 140px;
+        padding: 2px;
+        gap: 2px;
+    }
+    .monitor-body-wrap {
+        grid-template-columns: 1fr 85px !important;
+    }
+    .vital-box .vital-value {
+        font-size: 0.9rem !important;
+    }
+    .vital-box .vital-header {
+        font-size: 0.45rem;
+    }
+    .control-tabs .tab-btn {
+        padding: 3px 2px;
+        font-size: 0.5rem;
     }
     .rhythm-btn, .med-btn {
         padding: 3px 2px;
-        font-size: 0.58rem;
+        font-size: 0.52rem;
     }
 }
 
@@ -713,6 +795,7 @@ body.fullscreen-active .main-container {
     margin: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
+    height: 100dvh !important;
     max-width: 100vw !important;
     grid-template-columns: 1fr !important;
 }
@@ -722,12 +805,22 @@ body.fullscreen-active .monitor-bezel {
     border: none !important;
     width: 100vw !important;
     height: 100vh !important;
+    height: 100dvh !important;
+}
+
+body.fullscreen-active .monitor-body-wrap {
+    flex: 1;
+    min-height: 0;
 }
 
 body.fullscreen-active .exit-fullscreen-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    bottom: auto;
+    top: 6px;
+    right: 6px;
+    z-index: 200;
 }
 
 /* Color Coding for EtCO2 & A-Line IBP */
