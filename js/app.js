@@ -203,13 +203,30 @@ class CardiacMonitorApp {
             });
         }
 
-        // NIBP Measure Button
+        // NIBP Measure Button (Header & Sidebar)
         const nibpBtn = document.getElementById('nibpCycleBtn');
         if (nibpBtn) {
             nibpBtn.addEventListener('click', () => {
                 this.triggerNibpCycle();
             });
         }
+
+        const sidebarNibpBtn = document.getElementById('sidebarNibpStartBtn');
+        if (sidebarNibpBtn) {
+            sidebarNibpBtn.addEventListener('click', () => {
+                this.triggerNibpCycle();
+            });
+        }
+
+        // NIBP Interval Option Buttons (3m, 15m, 30m, Off)
+        document.querySelectorAll('[data-nibp-interval]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-nibp-interval]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const val = btn.getAttribute('data-nibp-interval');
+                this.setNibpInterval(val);
+            });
+        });
 
         // Defib Controls
         document.querySelectorAll('[data-joules]').forEach(btn => {
@@ -310,15 +327,55 @@ class CardiacMonitorApp {
         this.evaluateAlarms(rhythm);
     }
 
+    setNibpInterval(val) {
+        if (this.nibpTimer) {
+            clearInterval(this.nibpTimer);
+            this.nibpTimer = null;
+        }
+        if (val === 'manual') {
+            this.showNotification('NIBP Auto Timer Disabled (Manual Mode)', 'info');
+            return;
+        }
+        const mins = parseInt(val, 10);
+        if (isNaN(mins)) return;
+
+        this.showNotification(`NIBP Auto Cycle set for every ${mins} Minutes`, 'success');
+
+        this.triggerNibpCycle();
+
+        this.nibpTimer = setInterval(() => {
+            this.triggerNibpCycle();
+        }, mins * 60 * 1000);
+    }
+
     triggerNibpCycle() {
         const nibpValEl = document.getElementById('nibpValue');
+        const nibpBtn = document.getElementById('nibpCycleBtn');
+        const sidebarBtn = document.getElementById('sidebarNibpStartBtn');
+
         if (nibpValEl) nibpValEl.innerText = 'INFLATING...';
+        if (nibpBtn) {
+            nibpBtn.innerText = '[START]';
+            nibpBtn.disabled = true;
+        }
+        if (sidebarBtn) {
+            sidebarBtn.innerText = '⏳ INFLATING CUFF...';
+            sidebarBtn.disabled = true;
+        }
         this.audio.playNibpSound();
 
         setTimeout(() => {
             const { sys, dia, map } = this.currentNibp;
             if (nibpValEl) {
                 nibpValEl.innerText = sys === 0 ? '---/---' : `${sys}/${dia} (${map})`;
+            }
+            if (nibpBtn) {
+                nibpBtn.innerText = '[START]';
+                nibpBtn.disabled = false;
+            }
+            if (sidebarBtn) {
+                sidebarBtn.innerText = '⚡ START NIBP CUFF';
+                sidebarBtn.disabled = false;
             }
             this.showNotification(`NIBP Cycle Complete: ${sys}/${dia} mmHg`, 'info');
         }, 1500);

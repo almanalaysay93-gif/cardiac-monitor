@@ -274,6 +274,30 @@ body {
     color: var(--nibp-white);
 }
 
+.nibp-interval-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    padding: 8px 6px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.nibp-interval-btn:hover {
+    background: rgba(234, 179, 8, 0.15);
+    border-color: #facc15;
+    color: #ffffff;
+}
+.nibp-interval-btn.active {
+    background: rgba(234, 179, 8, 0.25);
+    border-color: #facc15;
+    color: #facc15;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.3);
+}
+
 .vital-resp {
     border-color: rgba(255, 235, 59, 0.3);
     color: var(--resp-yellow);
