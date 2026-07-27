@@ -65,7 +65,33 @@ class AudioSynthesizer {
         this.init();
         if (!this.ctx) return;
 
-        if (priority === 'high') {
+        if (priority === 'asystole') {
+            // Sharp, high-pitched emergency flatline beep tone (950 Hz sharp tone)
+            const playAsystoleBeep = () => {
+                if (this.isMuted || this.currentAlarmPriority !== 'asystole') return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth'; // Sharp piercing tone
+                osc.frequency.setValueAtTime(950, now);
+
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(this.volume * 0.5, now + 0.008);
+                gain.gain.setValueAtTime(this.volume * 0.5, now + 0.32);
+                gain.gain.linearRampToValueAtTime(0.001, now + 0.35);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.35);
+            };
+
+            playAsystoleBeep();
+            this.alarmInterval = setInterval(playAsystoleBeep, 400); // Continuous sharp piercing beep!
+
+        } else if (priority === 'high') {
             // High priority IEC 60601-1-8 alarm chime: 5 notes sequence
             const notes = [523.25, 659.25, 783.99, 1046.50, 783.99]; // C5, E5, G5, C6, G5
             const noteDur = 0.12;

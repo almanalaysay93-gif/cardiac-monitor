@@ -324,15 +324,16 @@ class CardiacMonitorApp {
         }, 1500);
     }
 
-    evaluateAlarms(rhythm) {
-        const lethalRhythms = ['vfib', 'vtach', 'asystole', 'torsades'];
-        const banner = document.getElementById('alarmBanner');
-
-        if (lethalRhythms.includes(rhythm)) {
+        if (rhythm === 'asystole') {
+            if (banner) {
+                banner.className = 'alarm-banner high-alarm';
+                banner.innerText = 'CRITICAL ALARM: ASYSTOLE / FLATLINE';
+            }
+            this.audio.startAlarm('asystole');
+        } else if (['vfib', 'vtach', 'torsades'].includes(rhythm)) {
             const names = {
                 'vfib': 'CRITICAL ALARM: VENTRICULAR FIBRILLATION',
                 'vtach': 'CRITICAL ALARM: VENTRICULAR TACHYCARDIA',
-                'asystole': 'CRITICAL ALARM: ASYSTOLE / FLATLINE',
                 'torsades': 'CRITICAL ALARM: TORSADES DE POINTES'
             };
             if (banner) {
