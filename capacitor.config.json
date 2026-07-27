@@ -1,0 +1,6 @@
+{
+  "appId": "com.cardiac.monitor",
+  "appName": "Cardiac Monitor",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

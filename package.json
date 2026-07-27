@@ -1,0 +1,14 @@
+{
+  "name": "cardiac-monitor",
+  "version": "1.0.0",
+  "description": "ICU Bedside Cardiac Monitor & ACLS Simulator",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo Building web assets"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  }
+}
