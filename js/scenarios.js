@@ -206,6 +206,24 @@ class ScenariosEngine {
             }
 
             this.app.showNotification(`🎉 RESUSCITATION SUCCESSFUL! Patient Stabilized in ${elapsed} Seconds!`, 'success');
+        } else {
+            // INCORRECT TREATMENT: Immediate deterioration to Asystole (Flatline)!
+            this.isResolved = true;
+            this.stopTimer();
+
+            this.generator.setRhythm('asystole');
+            this.app.selectRhythmUI('asystole');
+            this.app.currentSpo2 = 0;
+            this.app.currentNibp = { sys: 0, dia: 0, map: 0 };
+            this.app.updateVitalsDisplay();
+            this.app.evaluateAlarms('asystole');
+
+            const guideEl = document.getElementById('scenarioGuide');
+            if (guideEl) {
+                guideEl.innerHTML = `<span style="color:#ff2a5f;">🚨 INCORRECT TREATMENT: PATIENT FLATLINED INTO ASYSTOLE!</span>`;
+            }
+
+            this.app.showNotification(`🚨 INCORRECT INTERVENTION! Patient Deteriorated into Asystole (Flatline)!`, 'danger');
         }
     }
 
