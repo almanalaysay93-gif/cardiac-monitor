@@ -1,0 +1,503 @@
+/* ==========================================================================
+   CARDIAC MONITOR - MODERN BEDSIDE TELEMETRY MONITOR DESIGN SYSTEM
+   ========================================================================== */
+
+:root {
+    --bg-dark: #070a0d;
+    --bezel-bg: #0d131a;
+    --card-bg: rgba(18, 25, 35, 0.85);
+    --card-border: rgba(255, 255, 255, 0.08);
+
+    --ecg-green: #00ff66;
+    --ecg-green-glow: rgba(0, 255, 102, 0.35);
+    --spo2-cyan: #00e5ff;
+    --spo2-cyan-glow: rgba(0, 229, 255, 0.35);
+    --resp-yellow: #ffeb3b;
+    --resp-yellow-glow: rgba(255, 235, 59, 0.35);
+    --nibp-white: #e0f2fe;
+    --alarm-red: #ff2a5f;
+    --alarm-yellow: #ffb300;
+
+    --font-mono: 'Roboto Mono', monospace;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: #e2e8f0;
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* Header Bar */
+.monitor-header {
+    background: linear-gradient(180deg, #111823 0%, #0a0f16 100%);
+    border-bottom: 1px solid var(--card-border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-title h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+.brand-badge {
+    background: rgba(0, 255, 102, 0.15);
+    color: var(--ecg-green);
+    border: 1px solid rgba(0, 255, 102, 0.3);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.patient-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.patient-info span strong {
+    color: #f1f5f9;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--card-border);
+    color: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary {
+    background: #0284c7;
+    border-color: #38bdf8;
+}
+.btn-primary:hover {
+    background: #0369a1;
+}
+
+.btn-danger {
+    background: #dc2626;
+    border-color: #f87171;
+}
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.btn-warning {
+    background: #d97706;
+    border-color: #fbbf24;
+}
+
+/* Main Layout Grid */
+.main-container {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 16px;
+    padding: 16px;
+    flex: 1;
+    height: calc(100vh - 60px);
+}
+
+@media (max-width: 1100px) {
+    .main-container {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}
+
+/* Monitor Display Bezel */
+.monitor-bezel {
+    background: var(--bezel-bg);
+    border: 2px solid #1e293b;
+    border-radius: 12px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    overflow: hidden;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .monitor-bezel {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Waveform Canvas Container */
+.canvas-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #050b07;
+    min-height: 450px;
+}
+
+#monitorCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Vitals Numeric Side Column */
+.vitals-column {
+    background: #080d14;
+    border-left: 2px solid #1e293b;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+    gap: 10px;
+}
+
+.vital-box {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.vital-box .vital-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.vital-box .vital-value {
+    font-family: var(--font-mono);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.vital-box .vital-unit {
+    font-size: 0.75rem;
+    color: #64748b;
+    align-self: flex-end;
+    margin-top: -12px;
+}
+
+/* Color Coding for Vitals */
+.vital-hr {
+    border-color: rgba(0, 255, 102, 0.3);
+    color: var(--ecg-green);
+}
+.vital-hr .vital-value {
+    text-shadow: 0 0 12px var(--ecg-green-glow);
+}
+
+.heart-beat-icon {
+    display: inline-block;
+    color: var(--ecg-green);
+    animation: heartPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.3); }
+    30% { transform: scale(1); }
+}
+
+.vital-spo2 {
+    border-color: rgba(0, 229, 255, 0.3);
+    color: var(--spo2-cyan);
+}
+.vital-spo2 .vital-value {
+    text-shadow: 0 0 12px var(--spo2-cyan-glow);
+}
+
+.vital-nibp {
+    border-color: rgba(224, 242, 254, 0.3);
+    color: var(--nibp-white);
+}
+
+.vital-resp {
+    border-color: rgba(255, 235, 59, 0.3);
+    color: var(--resp-yellow);
+}
+.vital-resp .vital-value {
+    text-shadow: 0 0 12px var(--resp-yellow-glow);
+}
+
+/* Alarm Indicator Banner */
+.alarm-banner {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 20px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    z-index: 10;
+    display: none;
+}
+
+.alarm-banner.high-alarm {
+    display: block;
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+    animation: alarmBlink 0.6s infinite alternate;
+}
+
+.alarm-banner.yellow-alarm {
+    display: block;
+    background: #d97706;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(217, 119, 6, 0.6);
+}
+
+@keyframes alarmBlink {
+    0% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
+
+/* Control Panel Sidebar */
+.control-sidebar {
+    background: #0f172a;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Tabs Navigation */
+.control-tabs {
+    display: flex;
+    background: #090d16;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #94a3b8;
+    padding: 12px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: #f1f5f9;
+}
+
+.tab-btn.active {
+    color: #38bdf8;
+    border-bottom-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.05);
+}
+
+.tab-content {
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Rhythm Category Groups */
+.rhythm-group-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    margin: 12px 0 6px 0;
+    letter-spacing: 0.5px;
+}
+.rhythm-group-title:first-child {
+    margin-top: 0;
+}
+
+.rhythm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.rhythm-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    padding: 10px 8px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    line-height: 1.2;
+}
+
+.rhythm-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.rhythm-btn.active {
+    background: rgba(0, 255, 102, 0.15);
+    border-color: var(--ecg-green);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+}
+
+.rhythm-btn.lethal {
+    border-color: rgba(255, 42, 95, 0.4);
+}
+.rhythm-btn.lethal.active {
+    background: rgba(255, 42, 95, 0.25);
+    border-color: var(--alarm-red);
+    box-shadow: 0 0 12px rgba(255, 42, 95, 0.4);
+}
+
+/* Control Slider Group */
+.control-group {
+    margin-bottom: 16px;
+}
+
+.control-group label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+
+.range-slider {
+    width: 100%;
+    accent-color: #38bdf8;
+}
+
+/* Defibrillator UI Panel */
+.defib-card {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.defib-status {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #f87171;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.joule-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.joule-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+    padding: 6px 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.joule-btn.active {
+    background: #ef4444;
+    border-color: #f87171;
+}
+
+.defib-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* Notification Popup Toast */
+.notification-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #0f172a;
+    border: 1px solid #38bdf8;
+    color: #f1f5f9;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.notification-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
