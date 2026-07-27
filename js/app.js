@@ -308,6 +308,7 @@ class CardiacMonitorApp {
         }
         this.updateVitalsDisplay();
         this.evaluateAlarms(rhythm);
+        if (this.engine) this.engine.prefillBuffers();
     }
 
     triggerNibpCycle() {

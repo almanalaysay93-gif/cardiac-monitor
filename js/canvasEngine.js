@@ -54,10 +54,25 @@ class MonitorCanvasEngine {
                 this.alineBuffer = new Array(this.bufferLength).fill(0);
             }
             this.drawGrid();
+            this.prefillBuffers();
         };
 
         window.addEventListener('resize', resize);
         resize();
+    }
+
+    prefillBuffers() {
+        const w = this.canvas.width;
+        if (!w || !this.generator) return;
+        const dt = 0.016;
+        for (let x = 0; x < w; x++) {
+            const { ecg, pleth, resp, etco2, aline } = this.generator.getNextSample(dt);
+            this.ecgBuffer[x] = ecg;
+            this.plethBuffer[x] = pleth;
+            this.respBuffer[x] = resp;
+            this.etco2Buffer[x] = etco2;
+            this.alineBuffer[x] = aline;
+        }
     }
 
     setSweepSpeed(mmPerSec) {
