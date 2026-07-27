@@ -190,15 +190,10 @@ class ScenariosEngine {
 
             const elapsed = this.totalDuration - this.timeRemaining;
 
-            // Restore Sinus Rhythm & Normal Vitals
-            setTimeout(() => {
-                this.generator.setRhythm('nsr');
-                this.app.selectRhythmUI('nsr');
-                this.app.currentSpo2 = 98;
-                this.app.currentNibp = { sys: 120, dia: 80, map: 93 };
-                this.app.updateVitalsDisplay();
-                this.app.evaluateAlarms('nsr');
-            }, 800);
+            // Restore Sinus Rhythm & Normal Vitals Immediately, Stop Alarm Tone
+            this.generator.setRhythm('nsr');
+            this.app.selectRhythmUI('nsr');
+            this.app.updateVitalsForRhythm('nsr');
 
             const guideEl = document.getElementById('scenarioGuide');
             if (guideEl) {

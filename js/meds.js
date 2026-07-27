@@ -29,7 +29,8 @@ class MedicationController {
                         setTimeout(() => {
                             this.generator.setRhythm('nsr');
                             this.app.selectRhythmUI('nsr');
-                            this.app.showNotification('💊 Administered Amiodarone 300mg IV: Lethal Arrhythmia Converted to NSR!', 'success');
+                            this.app.updateVitalsForRhythm('nsr');
+                            this.app.showNotification('💊 Administered Amiodarone 300mg IV: Lethal Arrhythmia Converted to NSR! Alarm Stopped!', 'success');
                         }, 1200);
                     } else {
                         this.generator.medEffects.hrOffset = Math.max(-20, this.generator.medEffects.hrOffset - 25);
@@ -42,11 +43,12 @@ class MedicationController {
                 action: () => {
                     const rhythm = this.generator.currentRhythm;
                     this.generator.medEffects.hrOffset += 35;
-                    if (rhythm === 'brady' || rhythm === 'avblock1') {
+                    if (['brady', 'avblock1', 'avblock2_1', 'avblock2_2', 'avblock3'].includes(rhythm)) {
                         this.generator.setRhythm('nsr');
                         this.app.selectRhythmUI('nsr');
+                        this.app.updateVitalsForRhythm('nsr');
                     }
-                    this.app.showNotification('💊 Administered Atropine 1mg IV: Vagolytic HR Surge (+35 BPM)', 'success');
+                    this.app.showNotification('💊 Administered Atropine 1mg IV: HR Surge (+35 BPM) - Converted to NSR!', 'success');
                 }
             },
             'adenosine': {
@@ -60,7 +62,8 @@ class MedicationController {
                         this.generator.medEffects.transientPause = false;
                         this.generator.setRhythm('nsr');
                         this.app.selectRhythmUI('nsr');
-                        this.app.showNotification('✅ Adenosine Washout Complete: Normal Sinus Rhythm Restored!', 'success');
+                        this.app.updateVitalsForRhythm('nsr');
+                        this.app.showNotification('✅ Adenosine Washout Complete: Normal Sinus Rhythm Restored! Alarm Stopped!', 'success');
                     }, 2200);
                 }
             },
@@ -72,9 +75,10 @@ class MedicationController {
                     this.app.currentNibp.dia = Math.max(45, this.app.currentNibp.dia - 15);
                     this.app.currentNibp.map = Math.round((this.app.currentNibp.sys + 2 * this.app.currentNibp.dia) / 3);
                     
-                    if (this.generator.currentRhythm === 'stemi') {
+                    if (this.generator.currentRhythm === 'stemi' || this.generator.currentRhythm === 'ischemia') {
                         this.generator.setRhythm('nsr');
                         this.app.selectRhythmUI('nsr');
+                        this.app.updateVitalsForRhythm('nsr');
                     }
                     this.app.showNotification('💊 Nitroglycerin 0.4mg SL Given: ST Elevation Relieved & Vasodilation', 'success');
                 }

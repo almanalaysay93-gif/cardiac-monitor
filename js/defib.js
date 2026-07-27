@@ -55,12 +55,13 @@ class DefibController {
         const shockable = ['vfib', 'vtach', 'torsades'];
         
         if (shockable.includes(currentRhythm)) {
-            // Successful shock converts to Sinus Rhythm!
+            // Successful shock converts to Sinus Rhythm and stops alarm!
             setTimeout(() => {
                 this.generator.setRhythm('nsr');
                 if (this.app) {
                     this.app.selectRhythmUI('nsr');
-                    this.app.showNotification(`⚡ SHOCK DELIVERED (${this.selectedJoules}J): RHYTHM CONVERTED TO SINUS RHYTHM!`, 'success');
+                    this.app.updateVitalsForRhythm('nsr');
+                    this.app.showNotification(`⚡ SHOCK DELIVERED (${this.selectedJoules}J): RHYTHM CONVERTED TO SINUS RHYTHM! ALARM STOPPED!`, 'success');
                 }
             }, 600);
         } else if (currentRhythm === 'asystole') {
