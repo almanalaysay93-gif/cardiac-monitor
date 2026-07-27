@@ -203,11 +203,18 @@ class CardiacMonitorApp {
             });
         }
 
-        // NIBP Measure Button
+        // NIBP Measure Button & Interval Select
         const nibpBtn = document.getElementById('nibpCycleBtn');
         if (nibpBtn) {
             nibpBtn.addEventListener('click', () => {
                 this.triggerNibpCycle();
+            });
+        }
+
+        const nibpSelect = document.getElementById('nibpIntervalSelect');
+        if (nibpSelect) {
+            nibpSelect.addEventListener('change', (e) => {
+                this.setNibpInterval(e.target.value);
             });
         }
 
@@ -310,15 +317,51 @@ class CardiacMonitorApp {
         this.evaluateAlarms(rhythm);
     }
 
+    setNibpInterval(val) {
+        if (this.nibpTimer) {
+            clearInterval(this.nibpTimer);
+            this.nibpTimer = null;
+        }
+        const statusEl = document.getElementById('nibpTimerStatus');
+        if (val === 'manual') {
+            if (statusEl) statusEl.innerText = 'AUTO: OFF';
+            this.showNotification('NIBP Auto Timer Disabled (Manual Mode)', 'info');
+            return;
+        }
+        const mins = parseInt(val, 10);
+        if (isNaN(mins)) return;
+
+        if (statusEl) statusEl.innerText = `AUTO: ${mins}m`;
+        this.showNotification(`NIBP Auto Cycle set for every ${mins} Minutes`, 'success');
+
+        this.triggerNibpCycle();
+
+        this.nibpTimer = setInterval(() => {
+            this.triggerNibpCycle();
+        }, mins * 60 * 1000);
+    }
+
     triggerNibpCycle() {
         const nibpValEl = document.getElementById('nibpValue');
+        const nibpBtn = document.getElementById('nibpCycleBtn');
+
         if (nibpValEl) nibpValEl.innerText = 'INFLATING...';
+        if (nibpBtn) {
+            nibpBtn.innerText = 'INFLATING...';
+            nibpBtn.classList.add('inflating');
+            nibpBtn.disabled = true;
+        }
         this.audio.playNibpSound();
 
         setTimeout(() => {
             const { sys, dia, map } = this.currentNibp;
             if (nibpValEl) {
                 nibpValEl.innerText = sys === 0 ? '---/---' : `${sys}/${dia} (${map})`;
+            }
+            if (nibpBtn) {
+                nibpBtn.innerText = '▶ START';
+                nibpBtn.classList.remove('inflating');
+                nibpBtn.disabled = false;
             }
             this.showNotification(`NIBP Cycle Complete: ${sys}/${dia} mmHg`, 'info');
         }, 1500);

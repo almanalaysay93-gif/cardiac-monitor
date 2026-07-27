@@ -274,6 +274,41 @@ body {
     color: var(--nibp-white);
 }
 
+.nibp-interval-select {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    padding: 1px 4px;
+    outline: none;
+    cursor: pointer;
+}
+.nibp-interval-select option {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+.nibp-start-btn {
+    background: #0284c7;
+    border: 1px solid #38bdf8;
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+}
+.nibp-start-btn:hover {
+    background: #0369a1;
+    transform: scale(1.04);
+}
+
 .vital-resp {
     border-color: rgba(255, 235, 59, 0.3);
     color: var(--resp-yellow);
