@@ -2,13 +2,18 @@
   "name": "cardiac-monitor",
   "version": "1.0.0",
   "description": "ICU Bedside Cardiac Monitor & ACLS Simulator",
-  "main": "index.html",
+  "main": "main.js",
   "scripts": {
-    "build": "echo Building web assets"
+    "start": "electron .",
+    "package": "electron-packager . \"Cardiac Monitor\" --platform=win32 --arch=x64 --out=dist --overwrite --icon=icon.ico --ignore=\"/(android|node_modules|dist|\\.git|\\.idea)/\""
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
     "@capacitor/cli": "^7.0.0",
     "@capacitor/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-packager": "^17.1.2"
   }
 }

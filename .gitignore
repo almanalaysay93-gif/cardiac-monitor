@@ -3,7 +3,11 @@
 .DS_Store
 Thumbs.db
 
-# Node dependencies (if added in future)
+# Node dependencies & builds
 node_modules/
 dist/
 .env
+
+# Large binary builds
+*.zip
+*.apk
