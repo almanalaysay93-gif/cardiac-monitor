@@ -294,6 +294,14 @@ body {
         font-size: 0.6rem;
         padding: 3px 6px;
     }
+    /* Reset button on bottom left */
+    .reset-monitor-btn {
+        bottom: 6px;
+        left: 6px;
+        padding: 3px 8px;
+        font-size: 0.6rem;
+        border-radius: 12px;
+    }
     /* Exit fullscreen button: smaller, no overlap with RESP */
     .exit-fullscreen-btn {
         bottom: 4px;
@@ -750,6 +758,41 @@ body {
 .notification-toast.show {
     transform: translateY(0);
     opacity: 1;
+}
+
+/* Reset System Button Overlay (Bottom Left Corner) */
+.reset-monitor-btn {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 20;
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.reset-monitor-btn:hover {
+    background: #dc2626;
+    border-color: #f87171;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.6);
+    transform: scale(1.05);
+}
+
+.reset-monitor-btn:active {
+    transform: scale(0.95);
 }
 
 /* Exit Fullscreen Floating Overlay Button (Lower Right Corner) */

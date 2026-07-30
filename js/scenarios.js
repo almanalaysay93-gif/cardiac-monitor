@@ -168,6 +168,26 @@ class ScenariosEngine {
         }
     }
 
+    resetScenario() {
+        this.stopTimer();
+        this.activeScenario = null;
+        this.isResolved = false;
+        this.timeRemaining = 0;
+        const timerEls = document.querySelectorAll('.scenario-timer-display');
+        timerEls.forEach(el => {
+            el.innerText = `⏱️ 00:00`;
+            el.classList.remove('urgent');
+        });
+        const titleEl = document.getElementById('scenarioTitle');
+        const historyEl = document.getElementById('scenarioHistory');
+        const guideEl = document.getElementById('scenarioGuide');
+        if (titleEl) titleEl.innerText = 'ACLS Clinical Cases';
+        if (historyEl) historyEl.innerText = 'Select an emergency case below to start simulation:';
+        if (guideEl) guideEl.innerText = '';
+        const quickSelect = document.getElementById('quickScenarioSelect');
+        if (quickSelect) quickSelect.value = '';
+    }
+
     updateTimerDisplay() {
         const mins = Math.floor(this.timeRemaining / 60);
         const secs = this.timeRemaining % 60;

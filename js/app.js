@@ -283,6 +283,14 @@ class CardiacMonitorApp {
                 this.defib.nextQuizQuestion();
             });
         }
+
+        // Reset Monitor Button (Bottom Left Overlay)
+        const resetBtn = document.getElementById('resetMonitorBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                this.resetMonitor();
+            });
+        }
     }
 
     initUI() {
@@ -479,6 +487,89 @@ class CardiacMonitorApp {
         const fb = document.getElementById('quizFeedback');
         fb.innerHTML = `<strong>${text}</strong><br>Score: ${score} / ${total}`;
         document.getElementById('nextQuizBtn').style.display = 'inline-block';
+    }
+
+    resetMonitor() {
+        // 1. Reset generator rhythm & parameters to Normal Sinus Rhythm
+        this.generator.setRhythm('nsr');
+        this.generator.targetBpm = 75;
+        if (this.generator.medEffects) {
+            this.generator.medEffects = { hrOffset: 0, spo2Offset: 0, stShift: 0 };
+        }
+
+        // 2. Update UI selection to Normal Sinus Rhythm
+        this.selectRhythmUI('nsr');
+
+        // 3. Reset BPM Slider & UI Display text
+        const bpmSlider = document.getElementById('bpmSlider');
+        const bpmVal = document.getElementById('bpmVal');
+        if (bpmSlider) bpmSlider.value = 75;
+        if (bpmVal) bpmVal.innerText = '75 BPM';
+
+        // 4. Reset vitals values to baseline
+        this.currentSpo2 = 98;
+        this.currentNibp = { sys: 120, dia: 80, map: 93 };
+        this.currentResp = 14;
+        this.currentTemp = 37.0;
+        this.updateVitalsDisplay();
+
+        // 5. Cancel NIBP Timer & Reset auto cycle selector UI to manual/off
+        if (this.nibpTimer) {
+            clearInterval(this.nibpTimer);
+            this.nibpTimer = null;
+        }
+        document.querySelectorAll('[data-nibp-interval]').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-nibp-interval') === 'manual');
+        });
+
+        // 6. Stop active scenario case if running
+        if (this.scenarios && typeof this.scenarios.resetScenario === 'function') {
+            this.scenarios.resetScenario();
+        }
+
+        // 7. Reset Defibrillator state
+        if (this.defib) {
+            this.defib.isCharged = false;
+            this.defib.isSync = false;
+            const syncBtn = document.getElementById('syncBtn');
+            const qSync = document.querySelector('.quick-sync-btn');
+            if (syncBtn) {
+                syncBtn.classList.remove('btn-warning');
+                syncBtn.innerText = 'SYNC: OFF';
+            }
+            if (qSync) {
+                qSync.classList.remove('btn-warning');
+                qSync.innerText = 'SYNC: OFF';
+            }
+            this.updateDefibUI();
+        }
+
+        // 8. Stop Audio & Hide Alarm Banners
+        if (this.audio) {
+            this.audio.stopAlarm();
+        }
+        const banner = document.getElementById('alarmBanner');
+        if (banner) {
+            banner.className = 'alarm-banner';
+            banner.style.display = 'none';
+        }
+
+        // 9. Reset canvas engine freeze / caliper mode if active
+        if (this.engine) {
+            this.engine.isFrozen = false;
+            this.engine.caliperMode = false;
+            const freezeBtn = document.getElementById('freezeBtn');
+            const caliperBtn = document.getElementById('caliperBtn');
+            if (freezeBtn) {
+                freezeBtn.classList.remove('btn-primary');
+                freezeBtn.innerText = '⏸ Freeze';
+            }
+            if (caliperBtn) {
+                caliperBtn.classList.remove('btn-warning');
+            }
+        }
+
+        this.showNotification('System Reset: Baseline Normal Sinus Rhythm (NSR) & Vitals Restored', 'info');
     }
 
     showNotification(msg, type = 'info') {
